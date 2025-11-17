@@ -1,0 +1,81 @@
+# Validation Rules Configuration
+#
+# This file defines validation rules for incoming data records.
+# Rules are applied to all data sources unless overridden per source.
+#
+# Format:
+#   rules:
+#     <field_name>:
+#       - type: <rule_type>
+#         params: <rule_parameters>
+#         severity: error|warning (default: error)
+#         enabled: true|false (default: true)
+#
+# Rule types: required_field, type_check, range, regex, custom
+
+rules:
+  # Transaction ID validation
+  transaction_id:
+    - type: required_field
+      name: transaction_id_required
+    - type: regex
+      name: transaction_id_format
+      params:
+        pattern: "^TXN[0-9]{10}$"
+
+  # Amount validation
+  amount:
+    - type: required_field
+      name: amount_required
+    - type: type_check
+      name: amount_type
+      params:
+        expected_type: float
+        coerce: true
+    - type: range
+      name: amount_range
+      params:
+        min: 0.01
+        max: 1000000.00
+
+  # Timestamp validation
+  timestamp:
+    - type: required_field
+      name: timestamp_required
+    - type: type_check
+      name: timestamp_type
+      params:
+        expected_type: string  # Will be converted to datetime in transformation
+        coerce: true
+
+  # Email validation
+  email:
+    - type: regex
+      name: email_format
+      params:
+        pattern: "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
+      severity: warning  # Email is optional, just warn if invalid format
+
+  # Customer ID validation
+  customer_id:
+    - type: regex
+      name: customer_id_format
+      params:
+        pattern: "^CUST[0-9]{5}$"
+      severity: warning  # Optional field
+
+  # Status validation
+  status:
+    - type: regex
+      name: status_values
+      params:
+        pattern: "^(pending|completed|failed|cancelled)$"
+      severity: error
+
+  # Date validation
+  date:
+    - type: type_check
+      name: date_type
+      params:
+        expected_type: string
+        coerce: true
