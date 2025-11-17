@@ -99,18 +99,18 @@
 - [x] T046 [US1] Create src/core/schema/registry.py to save/load schemas from schema_version table
 - [x] T047 [US1] Create src/batch/readers/csv_reader.py to read CSV files using Spark with schema inference
 - [x] T048 [US1] Create src/batch/readers/file_reader.py for generic file reading (CSV, JSON, Parquet)
-- [ ] T049 [US1] Create src/batch/pipeline.py to orchestrate batch processing: read → validate → route → write
-- [ ] T050 [US1] Integrate ValidationEngine from Phase 2 into batch pipeline (apply rules to DataFrame)
-- [ ] T051 [US1] Create src/batch/writers/warehouse_writer.py to write valid records to warehouse_data table using bulk COPY
-- [ ] T052 [US1] Create src/batch/writers/quarantine_writer.py to write invalid records to quarantine_record table with error details
-- [ ] T053 [US1] Add duplicate detection logic in batch pipeline using record_id groupBy and deduplication
-- [ ] T054 [US1] Add type coercion logic (string → int/float/datetime) with fallback to quarantine on failure
-- [ ] T055 [US1] Create tests/unit/test_type_coercion.py to verify coercion rules and error handling
-- [ ] T056 [US1] Create src/cli/batch_cli.py with "process" command (argparse) for batch processing
-- [ ] T057 [US1] Add --dry-run flag to batch CLI for validation without writing
-- [ ] T058 [US1] Add batch metrics collection (records_processed, valid, invalid, throughput) to src/observability/metrics.py
-- [ ] T059 [US1] Add structured logging for batch pipeline (start, end, errors) to src/observability/logger.py
-- [ ] T060 [US1] Run tests/e2e/test_dirty_csv_batch.py and verify all assertions pass
+- [x] T049 [US1] Create src/batch/pipeline.py to orchestrate batch processing: read → validate → route → write
+- [x] T050 [US1] Integrate ValidationEngine from Phase 2 into batch pipeline (apply rules to DataFrame)
+- [x] T051 [US1] Create src/batch/writers/warehouse_writer.py to write valid records to warehouse_data table using bulk COPY
+- [x] T052 [US1] Create src/batch/writers/quarantine_writer.py to write invalid records to quarantine_record table with error details
+- [x] T053 [US1] Add duplicate detection logic in batch pipeline using record_id groupBy and deduplication
+- [x] T054 [US1] Add type coercion logic (string → int/float/datetime) with fallback to quarantine on failure
+- [x] T055 [US1] Create tests/unit/test_type_coercion.py to verify coercion rules and error handling
+- [x] T056 [US1] Create src/cli/batch_cli.py with "process" command (argparse) for batch processing
+- [x] T057 [US1] Add --dry-run flag to batch CLI for validation without writing
+- [x] T058 [US1] Add batch metrics collection (records_processed, valid, invalid, throughput) to src/observability/metrics.py
+- [x] T059 [US1] Add structured logging for batch pipeline (start, end, errors) to src/observability/logger.py
+- [x] T060 [US1] Run tests/e2e/test_dirty_csv_batch.py and verify all assertions pass
 
 **Checkpoint**: At this point, User Story 1 should be fully functional and testable independently (MVP complete!)
 
