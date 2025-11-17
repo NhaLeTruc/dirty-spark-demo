@@ -124,20 +124,20 @@
 
 ### Tests for User Story 4 ⚠️
 
-- [ ] T061 [P] [US4] Create tests/integration/test_audit_trail.py to verify lineage tracking end-to-end
-- [ ] T062 [P] [US4] Create tests/unit/test_lineage.py to verify AuditLog creation logic
+- [x] T061 [P] [US4] Create tests/integration/test_audit_trail.py to verify lineage tracking end-to-end
+- [x] T062 [P] [US4] Create tests/unit/test_lineage.py to verify AuditLog creation logic
 
 ### Implementation for User Story 4
 
-- [ ] T063 [P] [US4] Create src/warehouse/audit.py with functions to insert audit log entries
-- [ ] T064 [US4] Create src/observability/lineage.py to track transformations (type coercion, date normalization, etc.)
-- [ ] T065 [US4] Integrate lineage tracking into batch pipeline (log every transformation)
-- [ ] T066 [US4] Add lineage tracking to warehouse writer (log successful warehouse writes)
-- [ ] T067 [US4] Add lineage tracking to quarantine writer (log quarantine events)
-- [ ] T068 [US4] Create src/cli/admin_cli.py with "trace-record" command to query audit trail by record_id
-- [ ] T069 [US4] Add audit report generation command to admin CLI (total records, loaded, quarantined, transformations)
-- [ ] T070 [US4] Create tests for lineage query functions (verify audit_log table queries)
-- [ ] T071 [US4] Run tests/integration/test_audit_trail.py and verify lineage completeness
+- [x] T063 [P] [US4] Create src/warehouse/audit.py with functions to insert audit log entries
+- [x] T064 [US4] Create src/observability/lineage.py to track transformations (type coercion, date normalization, etc.)
+- [x] T065 [US4] Integrate lineage tracking into batch pipeline (log every transformation)
+- [x] T066 [US4] Add lineage tracking to warehouse writer (log successful warehouse writes)
+- [x] T067 [US4] Add lineage tracking to quarantine writer (log quarantine events)
+- [x] T068 [US4] Create src/cli/admin_cli.py with "trace-record" command to query audit trail by record_id
+- [x] T069 [US4] Add audit report generation command to admin CLI (total records, loaded, quarantined, transformations)
+- [x] T070 [US4] Create tests for lineage query functions (verify audit_log table queries)
+- [x] T071 [US4] Run tests/integration/test_audit_trail.py and verify lineage completeness
 
 **Checkpoint**: At this point, User Stories 1 AND 4 should both work independently (batch + audit operational)
 

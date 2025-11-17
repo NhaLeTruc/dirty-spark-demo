@@ -14,6 +14,7 @@ from src.batch.writers import BatchQuarantineWriter, BatchWarehouseWriter
 from src.core.models import DataRecord
 from src.core.rules import RuleConfigLoader, RuleEngine
 from src.core.schema import SchemaInferrer, SchemaRegistry
+from src.observability.lineage import LineageTracker
 from src.observability.logger import get_logger
 from src.warehouse.connection import DatabaseConnectionPool
 
@@ -37,7 +38,8 @@ class BatchPipeline:
         self,
         spark: SparkSession,
         pool: DatabaseConnectionPool,
-        validation_rules_path: str | None = None
+        validation_rules_path: str | None = None,
+        enable_lineage: bool = True
     ):
         """
         Initialize batch pipeline.
@@ -46,16 +48,24 @@ class BatchPipeline:
             spark: Active Spark session
             pool: Database connection pool
             validation_rules_path: Path to validation rules YAML file
+            enable_lineage: Whether to track data lineage (default: True)
         """
         self.spark = spark
         self.pool = pool
+        self.enable_lineage = enable_lineage
+
+        # Initialize lineage tracker
+        if enable_lineage:
+            self.lineage_tracker = LineageTracker(pool, batch_size=100)
+        else:
+            self.lineage_tracker = None
 
         # Initialize components
         self.file_reader = FileReader(spark)
         self.schema_inferrer = SchemaInferrer(spark)
         self.schema_registry = SchemaRegistry(pool, self.schema_inferrer)
-        self.warehouse_writer = BatchWarehouseWriter(pool)
-        self.quarantine_writer = BatchQuarantineWriter(pool)
+        self.warehouse_writer = BatchWarehouseWriter(pool, self.lineage_tracker)
+        self.quarantine_writer = BatchQuarantineWriter(pool, self.lineage_tracker)
 
         # Load validation rules
         self.validation_rules_path = validation_rules_path or "config/validation_rules.yaml"
@@ -113,7 +123,7 @@ class BatchPipeline:
         duplicate_count = 0
         if deduplicate:
             logger.info("Deduplicating records...")
-            df, duplicate_count = self._deduplicate(df)
+            df, duplicate_count = self._deduplicate(df, source_id)
             logger.info(f"Removed {duplicate_count} duplicate records")
 
         # Step 4: Validate records
@@ -144,6 +154,10 @@ class BatchPipeline:
             )
             logger.info(f"Wrote {quarantine_count} records to quarantine")
 
+        # Flush any pending audit logs
+        if self.lineage_tracker:
+            self.lineage_tracker.flush()
+
         logger.info("Batch processing complete")
 
         return {
@@ -155,12 +169,13 @@ class BatchPipeline:
             "schema_confidence": confidence
         }
 
-    def _deduplicate(self, df: DataFrame) -> tuple[DataFrame, int]:
+    def _deduplicate(self, df: DataFrame, source_id: str) -> tuple[DataFrame, int]:
         """
         Remove duplicate records based on record_id or transaction_id.
 
         Args:
             df: Input DataFrame
+            source_id: Data source ID for lineage tracking
 
         Returns:
             Tuple of (deduplicated_df, duplicate_count)
@@ -182,6 +197,15 @@ class BatchPipeline:
         deduped_df = df.dropDuplicates([id_column])
         final_count = deduped_df.count()
         duplicate_count = original_count - final_count
+
+        # Track deduplication in lineage
+        if duplicate_count > 0 and self.lineage_tracker:
+            # Track a single deduplication event for the batch
+            self.lineage_tracker.track_deduplication(
+                record_id=f"batch_{source_id}",
+                source_id=source_id,
+                duplicate_count=duplicate_count
+            )
 
         return deduped_df, duplicate_count
 
