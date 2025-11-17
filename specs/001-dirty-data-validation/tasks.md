@@ -24,19 +24,19 @@
 
 **Purpose**: Project initialization and basic structure
 
-- [ ] T001 Create project root directories (src/, tests/, docker/, config/)
-- [ ] T002 Initialize Python 3.11 project with pyproject.toml and setup.py
-- [ ] T003 [P] Create requirements.txt with pinned versions (pyspark==3.5.1, psycopg[binary,pool]==3.1.18, pydantic==2.6.3, pytest==8.1.0, etc.)
-- [ ] T004 [P] Create .gitignore for Python (__pycache__, .venv, .pytest_cache, checkpoints/)
-- [ ] T005 [P] Create docker/docker-compose.yml with PostgreSQL 16.2, Spark 3.5.1, Kafka 3.7.0, Zookeeper
-- [ ] T006 [P] Create docker/Dockerfile.spark for Spark master/worker image
-- [ ] T007 [P] Create docker/init-db.sql with DDL from data-model.md (all tables, indexes, partitions)
-- [ ] T008 [P] Create config/local.env with database connection strings and Spark config
-- [ ] T009 [P] Create config/test.env for test environment
-- [ ] T010 [P] Configure pytest in tests/conftest.py with testcontainers fixtures
-- [ ] T011 [P] Configure black, ruff, mypy in pyproject.toml
-- [ ] T012 [P] Create src/__init__.py and all submodule __init__.py files
-- [ ] T013 Create README.md with quickstart instructions
+- [x] T001 Create project root directories (src/, tests/, docker/, config/)
+- [x] T002 Initialize Python 3.11 project with pyproject.toml and setup.py
+- [x] T003 [P] Create requirements.txt with pinned versions (pyspark==3.5.1, psycopg[binary,pool]==3.1.18, pydantic==2.6.3, pytest==8.1.0, etc.)
+- [x] T004 [P] Create .gitignore for Python (__pycache__, .venv, .pytest_cache, checkpoints/)
+- [x] T005 [P] Create docker/docker-compose.yml with PostgreSQL 16.2, Spark 3.5.1, Kafka 3.7.0, Zookeeper
+- [x] T006 [P] Create docker/Dockerfile.spark for Spark master/worker image
+- [x] T007 [P] Create docker/init-db.sql with DDL from data-model.md (all tables, indexes, partitions)
+- [x] T008 [P] Create config/local.env with database connection strings and Spark config
+- [x] T009 [P] Create config/test.env for test environment
+- [x] T010 [P] Configure pytest in tests/conftest.py with testcontainers fixtures
+- [x] T011 [P] Configure black, ruff, mypy in pyproject.toml
+- [x] T012 [P] Create src/__init__.py and all submodule __init__.py files
+- [x] T013 Create README.md with quickstart instructions
 
 ---
 
@@ -46,33 +46,33 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T014 [P] Create src/warehouse/connection.py with PostgreSQL connection pool using psycopg3
-- [ ] T015 [P] Create src/observability/logger.py with structured JSON logging (python-json-logger)
-- [ ] T016 [P] Create src/observability/metrics.py with Prometheus metrics (Counter, Histogram, Gauge)
-- [ ] T017 [P] Create tests/unit/test_connection_pool.py to verify database connectivity
-- [ ] T018 Create src/core/models/data_source.py with Pydantic DataSource model from data-model.md
-- [ ] T019 Create src/core/models/validation_rule.py with Pydantic ValidationRule model from data-model.md
-- [ ] T020 Create src/core/models/data_record.py with Pydantic DataRecord model from data-model.md
-- [ ] T021 Create src/core/models/warehouse_data.py with Pydantic WarehouseData model from data-model.md
-- [ ] T022 Create src/core/models/quarantine_record.py with Pydantic QuarantineRecord model from data-model.md
-- [ ] T023 Create src/core/models/validation_result.py with Pydantic ValidationResult model from data-model.md
-- [ ] T024 Create src/core/models/schema_version.py with Pydantic SchemaVersion model from data-model.md
-- [ ] T025 Create src/core/models/audit_log.py with Pydantic AuditLog model from data-model.md
-- [ ] T026 [P] Create tests/unit/test_pydantic_models.py to validate all models with valid/invalid data
-- [ ] T027 Create src/core/validators/base_validator.py with abstract Validator interface
-- [ ] T028 [P] Create src/core/validators/required_field.py with RequiredFieldValidator
-- [ ] T029 [P] Create src/core/validators/type_validator.py with TypeCheckValidator (string, int, float, datetime)
-- [ ] T030 [P] Create src/core/validators/range_validator.py with RangeValidator (min/max)
-- [ ] T031 [P] Create src/core/validators/regex_validator.py with RegexValidator
-- [ ] T032 [P] Create src/core/validators/custom_validator.py with extensible CustomValidator framework
-- [ ] T033 [P] Create tests/unit/test_validators.py with property-based tests (hypothesis) for all validators
-- [ ] T034 Create src/core/rules/rule_config.py to load validation rules from YAML config
-- [ ] T035 Create src/core/rules/rule_engine.py with ValidationEngine that runs all rules on a record
-- [ ] T036 Create tests/unit/test_rule_engine.py to verify rule engine with multiple rules
+- [x] T014 [P] Create src/warehouse/connection.py with PostgreSQL connection pool using psycopg3
+- [x] T015 [P] Create src/observability/logger.py with structured JSON logging (python-json-logger)
+- [x] T016 [P] Create src/observability/metrics.py with Prometheus metrics (Counter, Histogram, Gauge)
+- [x] T017 [P] Create tests/unit/test_connection_pool.py to verify database connectivity
+- [x] T018 Create src/core/models/data_source.py with Pydantic DataSource model from data-model.md
+- [x] T019 Create src/core/models/validation_rule.py with Pydantic ValidationRule model from data-model.md
+- [x] T020 Create src/core/models/data_record.py with Pydantic DataRecord model from data-model.md
+- [x] T021 Create src/core/models/warehouse_data.py with Pydantic WarehouseData model from data-model.md
+- [x] T022 Create src/core/models/quarantine_record.py with Pydantic QuarantineRecord model from data-model.md
+- [x] T023 Create src/core/models/validation_result.py with Pydantic ValidationResult model from data-model.md
+- [x] T024 Create src/core/models/schema_version.py with Pydantic SchemaVersion model from data-model.md
+- [x] T025 Create src/core/models/audit_log.py with Pydantic AuditLog model from data-model.md
+- [x] T026 [P] Create tests/unit/test_pydantic_models.py to validate all models with valid/invalid data
+- [x] T027 Create src/core/validators/base_validator.py with abstract Validator interface
+- [x] T028 [P] Create src/core/validators/required_field.py with RequiredFieldValidator
+- [x] T029 [P] Create src/core/validators/type_validator.py with TypeCheckValidator (string, int, float, datetime)
+- [x] T030 [P] Create src/core/validators/range_validator.py with RangeValidator (min/max)
+- [x] T031 [P] Create src/core/validators/regex_validator.py with RegexValidator
+- [x] T032 [P] Create src/core/validators/custom_validator.py with extensible CustomValidator framework
+- [x] T033 [P] Create tests/unit/test_validators.py with property-based tests (hypothesis) for all validators
+- [x] T034 Create src/core/rules/rule_config.py to load validation rules from YAML config
+- [x] T035 Create src/core/rules/rule_engine.py with ValidationEngine that runs all rules on a record
+- [x] T036 Create tests/unit/test_rule_engine.py to verify rule engine with multiple rules
 - [ ] T037 Create config/validation_rules.yaml with sample rules (transaction_id, amount, timestamp, email)
-- [ ] T038 Create src/warehouse/schema_mgmt.py with DDL execution and table creation functions
-- [ ] T039 Create src/warehouse/upsert.py with idempotent upsert using INSERT ... ON CONFLICT
-- [ ] T040 Create tests/integration/test_warehouse_ops.py with testcontainers PostgreSQL to verify upsert idempotency
+- [x] T038 Create src/warehouse/schema_mgmt.py with DDL execution and table creation functions
+- [x] T039 Create src/warehouse/upsert.py with idempotent upsert using INSERT ... ON CONFLICT
+- [x] T040 Create tests/integration/test_warehouse_ops.py with testcontainers PostgreSQL to verify upsert idempotency
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 

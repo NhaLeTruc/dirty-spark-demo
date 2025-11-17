@@ -1,0 +1,50 @@
+FROM bitnami/spark:3.5.1
+
+# Switch to root to install additional packages
+USER root
+
+# Install Python 3.11 and required system packages
+RUN install_packages \
+    python3.11 \
+    python3.11-dev \
+    python3-pip \
+    curl \
+    wget \
+    postgresql-client \
+    && ln -sf /usr/bin/python3.11 /usr/bin/python3 \
+    && ln -sf /usr/bin/python3.11 /usr/bin/python
+
+# Upgrade pip
+RUN python3 -m pip install --upgrade pip
+
+# Install Python dependencies for Spark jobs
+RUN pip3 install --no-cache-dir \
+    pyspark==3.5.1 \
+    pyarrow==15.0.0 \
+    pandas==2.2.1 \
+    psycopg[binary,pool]==3.1.18 \
+    pydantic==2.6.3 \
+    pyyaml==6.0.1 \
+    python-json-logger==2.0.7 \
+    prometheus-client==0.20.0
+
+# Create directories for checkpoints and logs
+RUN mkdir -p /opt/spark/checkpoints /opt/spark/logs \
+    && chown -R 1001:1001 /opt/spark/checkpoints /opt/spark/logs
+
+# Switch back to spark user
+USER 1001
+
+# Set working directory
+WORKDIR /opt/spark
+
+# Expose Spark ports
+# 7077: Spark Master port
+# 8080: Spark Master Web UI
+# 8081: Spark Worker Web UI
+# 4040: Spark Application Web UI
+EXPOSE 7077 8080 8081 4040
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+    CMD curl -f http://localhost:8080 || curl -f http://localhost:8081 || exit 1
