@@ -4,20 +4,18 @@ Batch processing pipeline orchestration.
 Coordinates the flow: read → validate → deduplicate → route → write
 """
 
-from typing import Tuple, Dict, Any, Optional
 from pathlib import Path
-from pyspark.sql import SparkSession, DataFrame
-from pyspark.sql.functions import col, struct, array, lit, concat_ws
-from pyspark.sql.types import ArrayType, StringType
+from typing import Any
 
-from src.warehouse.connection import DatabaseConnectionPool
-from src.core.schema import SchemaInferrer, SchemaRegistry
-from src.core.rules import RuleEngine, RuleConfigLoader
-from src.core.models import DataRecord, ValidationResult
+from pyspark.sql import DataFrame, SparkSession
+
 from src.batch.readers import FileReader
-from src.batch.writers import BatchWarehouseWriter, BatchQuarantineWriter
+from src.batch.writers import BatchQuarantineWriter, BatchWarehouseWriter
+from src.core.models import DataRecord
+from src.core.rules import RuleConfigLoader, RuleEngine
+from src.core.schema import SchemaInferrer, SchemaRegistry
 from src.observability.logger import get_logger
-
+from src.warehouse.connection import DatabaseConnectionPool
 
 logger = get_logger(__name__)
 
@@ -39,7 +37,7 @@ class BatchPipeline:
         self,
         spark: SparkSession,
         pool: DatabaseConnectionPool,
-        validation_rules_path: Optional[str] = None
+        validation_rules_path: str | None = None
     ):
         """
         Initialize batch pipeline.
@@ -76,7 +74,7 @@ class BatchPipeline:
         file_format: str = "csv",
         deduplicate: bool = True,
         **read_options
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Process a file through the complete pipeline.
 
@@ -157,7 +155,7 @@ class BatchPipeline:
             "schema_confidence": confidence
         }
 
-    def _deduplicate(self, df: DataFrame) -> Tuple[DataFrame, int]:
+    def _deduplicate(self, df: DataFrame) -> tuple[DataFrame, int]:
         """
         Remove duplicate records based on record_id or transaction_id.
 
@@ -191,7 +189,7 @@ class BatchPipeline:
         self,
         df: DataFrame,
         source_id: str
-    ) -> Tuple[Optional[DataFrame], Optional[DataFrame]]:
+    ) -> tuple[DataFrame | None, DataFrame | None]:
         """
         Validate DataFrame records using rule engine.
 
@@ -218,7 +216,11 @@ class BatchPipeline:
             record_dict = row.asDict()
 
             # Create DataRecord
-            record_id = record_dict.get("transaction_id") or record_dict.get("record_id") or "unknown"
+            record_id = (
+                record_dict.get("transaction_id")
+                or record_dict.get("record_id")
+                or "unknown"
+            )
             data_record = DataRecord(
                 record_id=str(record_id),
                 source_id=source_id,

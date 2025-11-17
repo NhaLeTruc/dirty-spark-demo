@@ -4,11 +4,11 @@ Batch warehouse writer for valid records.
 Writes validated records to warehouse_data table using bulk operations.
 """
 
-from typing import List
 from pyspark.sql import DataFrame
+
+from src.core.models import WarehouseData
 from src.warehouse.connection import DatabaseConnectionPool
 from src.warehouse.upsert import WarehouseWriter as UpsertWriter
-from src.core.models import WarehouseData
 
 
 class BatchWarehouseWriter:

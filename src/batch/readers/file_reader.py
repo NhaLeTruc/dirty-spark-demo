@@ -2,9 +2,10 @@
 Generic file reader for multiple formats (CSV, JSON, Parquet).
 """
 
-from typing import Optional
-from pyspark.sql import SparkSession, DataFrame
+
+from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql.types import StructType
+
 from .csv_reader import CSVReader
 
 
@@ -27,7 +28,7 @@ class FileReader:
         self,
         file_path: str,
         file_format: str = "csv",
-        schema: Optional[StructType] = None,
+        schema: StructType | None = None,
         **options
     ) -> DataFrame:
         """
