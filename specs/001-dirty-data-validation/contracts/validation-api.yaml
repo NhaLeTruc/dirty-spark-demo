@@ -1,0 +1,427 @@
+# Validation Pipeline CLI API Contract
+# Version: 1.0.0
+# Purpose: Define CLI commands and configuration interfaces for the dirty data validation pipeline
+
+cli_version: "1.0.0"
+description: "Command-line interface for batch and streaming data validation pipelines"
+
+# ==========================
+# BATCH PROCESSING COMMANDS
+# ==========================
+
+commands:
+  batch:
+    process:
+      description: "Process a batch of data from a source"
+      usage: "python -m src.cli.batch_cli process --source <source_id> --input <path> [OPTIONS]"
+      arguments:
+        - name: source
+          type: string
+          required: true
+          description: "Source identifier from data_source table"
+
+        - name: input
+          type: string
+          required: true
+          description: "Path to input file or directory (CSV, JSON, Parquet)"
+
+        - name: validation-rules
+          type: string
+          required: false
+          default: "config/validation_rules.yaml"
+          description: "Path to validation rules configuration"
+
+        - name: schema-inference
+          type: boolean
+          required: false
+          default: true
+          description: "Enable automatic schema inference"
+
+        - name: schema-confidence-threshold
+          type: float
+          required: false
+          default: 0.95
+          description: "Minimum confidence for schema inference (0.0-1.0)"
+
+        - name: chunk-size
+          type: integer
+          required: false
+          default: 10000
+          description: "Records per processing chunk"
+
+        - name: dry-run
+          type: boolean
+          required: false
+          default: false
+          description: "Validate without writing to warehouse"
+
+      outputs:
+        - name: validation_summary
+          format: json
+          description: "Summary of validation results"
+          schema:
+            type: object
+            properties:
+              total_records: integer
+              valid_records: integer
+              invalid_records: integer
+              processing_time_seconds: float
+              quarantine_file: string
+              warehouse_records_written: integer
+
+      exit_codes:
+        0: "Success - all records processed"
+        1: "Partial failure - some records quarantined but processing completed"
+        2: "Fatal error - processing could not complete"
+
+  # ==========================
+  # STREAMING COMMANDS
+  # ==========================
+
+  streaming:
+    start:
+      description: "Start a streaming pipeline"
+      usage: "python -m src.cli.stream_cli start --source <source_id> --stream-source <type> [OPTIONS]"
+      arguments:
+        - name: source
+          type: string
+          required: true
+          description: "Source identifier"
+
+        - name: stream-source
+          type: string
+          required: true
+          enum: ["kafka", "file_stream", "socket"]
+          description: "Type of streaming source"
+
+        - name: kafka-topic
+          type: string
+          required: false
+          description: "Kafka topic name (required if stream-source=kafka)"
+
+        - name: kafka-bootstrap-servers
+          type: string
+          required: false
+          description: "Kafka bootstrap servers (required if stream-source=kafka)"
+
+        - name: file-stream-path
+          type: string
+          required: false
+          description: "Directory to watch for new files (required if stream-source=file_stream)"
+
+        - name: checkpoint-location
+          type: string
+          required: true
+          description: "Directory for Spark checkpoints"
+
+        - name: trigger-interval
+          type: string
+          required: false
+          default: "10 seconds"
+          description: "Micro-batch trigger interval"
+
+        - name: validation-rules
+          type: string
+          required: false
+          default: "config/validation_rules.yaml"
+          description: "Path to validation rules"
+
+      outputs:
+        - name: stream_status
+          format: json
+          description: "Streaming query status"
+          schema:
+            type: object
+            properties:
+              query_id: string
+              status: string
+              checkpoint_location: string
+              started_at: string
+
+      exit_codes:
+        0: "Stream started successfully"
+        2: "Fatal error - could not start stream"
+
+    stop:
+      description: "Stop a running streaming pipeline"
+      usage: "python -m src.cli.stream_cli stop --query-id <id>"
+      arguments:
+        - name: query-id
+          type: string
+          required: true
+          description: "Streaming query ID to stop"
+
+      exit_codes:
+        0: "Stream stopped successfully"
+        1: "Query not found"
+
+  # ==========================
+  # ADMINISTRATION COMMANDS
+  # ==========================
+
+  admin:
+    register-source:
+      description: "Register a new data source"
+      usage: "python -m src.cli.admin_cli register-source --source-id <id> --source-type <type> [OPTIONS]"
+      arguments:
+        - name: source-id
+          type: string
+          required: true
+          description: "Unique identifier for the source"
+
+        - name: source-type
+          type: string
+          required: true
+          enum: ["csv_file", "kafka_topic", "json_stream", "api_endpoint"]
+          description: "Type of data source"
+
+        - name: connection-info
+          type: string
+          required: true
+          description: "JSON string with connection details"
+
+      exit_codes:
+        0: "Source registered successfully"
+        1: "Source already exists"
+        2: "Invalid configuration"
+
+    list-sources:
+      description: "List all registered data sources"
+      usage: "python -m src.cli.admin_cli list-sources [--enabled-only]"
+      arguments:
+        - name: enabled-only
+          type: boolean
+          required: false
+          default: false
+          description: "Show only enabled sources"
+
+      outputs:
+        - name: sources_list
+          format: table
+          description: "List of data sources"
+
+    add-validation-rule:
+      description: "Add a new validation rule"
+      usage: "python -m src.cli.admin_cli add-rule --rule-name <name> --rule-type <type> --field <field> [OPTIONS]"
+      arguments:
+        - name: rule-name
+          type: string
+          required: true
+          description: "Unique rule name"
+
+        - name: rule-type
+          type: string
+          required: true
+          enum: ["required_field", "type_check", "range", "regex", "custom"]
+          description: "Type of validation rule"
+
+        - name: field-name
+          type: string
+          required: true
+          description: "Field to validate"
+
+        - name: parameters
+          type: string
+          required: false
+          description: "JSON string with rule parameters"
+
+        - name: severity
+          type: string
+          required: false
+          default: "error"
+          enum: ["error", "warning"]
+          description: "Rule severity"
+
+      exit_codes:
+        0: "Rule added successfully"
+        1: "Rule already exists"
+        2: "Invalid parameters"
+
+    quarantine-review:
+      description: "Review quarantined records"
+      usage: "python -m src.cli.admin_cli review-quarantine [--source <source_id>] [--limit <n>]"
+      arguments:
+        - name: source
+          type: string
+          required: false
+          description: "Filter by source ID"
+
+        - name: limit
+          type: integer
+          required: false
+          default: 100
+          description: "Max records to display"
+
+        - name: group-by-error
+          type: boolean
+          required: false
+          default: true
+          description: "Group by error type"
+
+      outputs:
+        - name: quarantine_summary
+          format: table
+          description: "Quarantined records grouped by error"
+
+    reprocess-quarantine:
+      description: "Reprocess quarantined records after rule updates"
+      usage: "python -m src.cli.admin_cli reprocess --source <source_id> [--quarantine-ids <ids>]"
+      arguments:
+        - name: source
+          type: string
+          required: true
+          description: "Source to reprocess"
+
+        - name: quarantine-ids
+          type: string
+          required: false
+          description: "Comma-separated list of specific quarantine IDs (if omitted, reprocess all)"
+
+        - name: validation-rules
+          type: string
+          required: false
+          default: "config/validation_rules.yaml"
+          description: "Updated validation rules"
+
+      exit_codes:
+        0: "Reprocessing completed successfully"
+        1: "Some records still fail validation"
+
+# ==========================
+# CONFIGURATION FILE SCHEMAS
+# ==========================
+
+configuration_files:
+  validation_rules:
+    path: "config/validation_rules.yaml"
+    description: "Validation rules configuration"
+    schema:
+      type: object
+      properties:
+        rules:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: object
+              properties:
+                type:
+                  type: string
+                  enum: ["required", "type_check", "range", "regex", "custom"]
+                params:
+                  type: object
+              required: ["type"]
+      required: ["rules"]
+    example: |
+      rules:
+        transaction_id:
+          - type: required
+          - type: regex
+            params:
+              pattern: "^TXN[0-9]{10}$"
+
+        amount:
+          - type: required
+          - type: type_check
+            params:
+              expected_type: float
+          - type: range
+            params:
+              min: 0.01
+              max: 1000000.00
+
+  batch_config:
+    path: "config/batch_config.yaml"
+    description: "Batch processing configuration"
+    schema:
+      type: object
+      properties:
+        spark:
+          type: object
+          properties:
+            sql.adaptive.enabled:
+              type: boolean
+              default: true
+            sql.shuffle.partitions:
+              type: integer
+              default: 200
+        processing:
+          type: object
+          properties:
+            chunk_size:
+              type: integer
+              default: 10000
+            schema_inference_sample_size:
+              type: integer
+              default: 1000
+    example: |
+      spark:
+        sql.adaptive.enabled: true
+        sql.shuffle.partitions: 200
+      processing:
+        chunk_size: 10000
+        schema_inference_sample_size: 1000
+
+  stream_config:
+    path: "config/stream_config.yaml"
+    description: "Streaming configuration"
+    schema:
+      type: object
+      properties:
+        spark:
+          type: object
+          properties:
+            sql.streaming.checkpointLocation:
+              type: string
+            sql.streaming.stateStore.providerClass:
+              type: string
+        trigger:
+          type: string
+          default: "processingTime=10 seconds"
+    example: |
+      spark:
+        sql.streaming.checkpointLocation: /checkpoints
+        sql.streaming.stateStore.providerClass: org.apache.spark.sql.execution.streaming.state.RocksDBStateStoreProvider
+      trigger: processingTime=10 seconds
+
+# ==========================
+# METRICS & MONITORING
+# ==========================
+
+metrics:
+  prometheus_endpoint: "/metrics"
+  port: 8000
+  metrics_exposed:
+    - name: pipeline_records_processed_total
+      type: counter
+      labels: ["source_id", "status"]
+      description: "Total records processed by status"
+
+    - name: pipeline_processing_seconds
+      type: histogram
+      labels: ["source_id"]
+      description: "Record processing latency"
+
+    - name: pipeline_quarantine_records
+      type: gauge
+      labels: ["source_id"]
+      description: "Current quarantine size"
+
+    - name: pipeline_validation_failures_total
+      type: counter
+      labels: ["source_id", "rule_type"]
+      description: "Validation failures by rule type"
+
+# ==========================
+# ERROR CODES
+# ==========================
+
+error_codes:
+  ERR_001: "Invalid source ID"
+  ERR_002: "Connection to warehouse failed"
+  ERR_003: "Schema inference confidence too low"
+  ERR_004: "Validation rule configuration invalid"
+  ERR_005: "Checkpoint directory not writable"
+  ERR_006: "Kafka connection failed"
+  ERR_007: "Input file not found or unreadable"
+  ERR_008: "Schema evolution conflict detected"
