@@ -8,12 +8,12 @@ Usage:
 import argparse
 import sys
 from pathlib import Path
+
 from pyspark.sql import SparkSession
 
-from src.warehouse.connection import DatabaseConnectionPool, initialize_pool, close_pool
 from src.batch.pipeline import BatchPipeline
 from src.observability.logger import get_logger
-
+from src.warehouse.connection import DatabaseConnectionPool
 
 logger = get_logger(__name__)
 
@@ -101,7 +101,10 @@ def process_command(args):
         logger.info(f"Valid records (warehouse): {result['valid_records']}")
         logger.info(f"Invalid records (quarantine): {result['invalid_records']}")
         logger.info(f"Duplicate records removed: {result['duplicate_records']}")
-        logger.info(f"Schema version: {result['schema_id']} (confidence: {result['schema_confidence']:.2f})")
+        logger.info(
+            f"Schema version: {result['schema_id']} "
+            f"(confidence: {result['schema_confidence']:.2f})"
+        )
         logger.info("=" * 60)
 
         if args.dry_run:

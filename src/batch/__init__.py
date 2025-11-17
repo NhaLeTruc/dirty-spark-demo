@@ -4,7 +4,7 @@ Spark batch processing module.
 
 from .pipeline import BatchPipeline
 from .readers import CSVReader, FileReader
-from .writers import BatchWarehouseWriter, BatchQuarantineWriter
+from .writers import BatchQuarantineWriter, BatchWarehouseWriter
 
 __all__ = [
     "BatchPipeline",

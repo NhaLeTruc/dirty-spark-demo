@@ -4,11 +4,13 @@ Batch quarantine writer for invalid records.
 Writes invalid records to quarantine_record table with detailed error messages.
 """
 
-from typing import List, Dict, Any
+from typing import Any
+
 from pyspark.sql import DataFrame
+
+from src.core.models import QuarantineRecord
 from src.warehouse.connection import DatabaseConnectionPool
 from src.warehouse.upsert import QuarantineWriter as UpsertQuarantineWriter
-from src.core.models import QuarantineRecord
 
 
 class BatchQuarantineWriter:
@@ -92,7 +94,7 @@ class BatchQuarantineWriter:
 
     def write_with_errors(
         self,
-        records: List[Dict[str, Any]],
+        records: list[dict[str, Any]],
         source_id: str
     ) -> int:
         """

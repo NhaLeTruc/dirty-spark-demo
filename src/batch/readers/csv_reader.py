@@ -2,8 +2,8 @@
 CSV reader using Spark for batch processing.
 """
 
-from typing import Optional
-from pyspark.sql import SparkSession, DataFrame
+
+from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql.types import StructType
 
 
@@ -24,7 +24,7 @@ class CSVReader:
     def read(
         self,
         file_path: str,
-        schema: Optional[StructType] = None,
+        schema: StructType | None = None,
         header: bool = True,
         delimiter: str = ",",
         infer_schema: bool = True
