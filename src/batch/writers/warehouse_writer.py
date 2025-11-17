@@ -7,6 +7,7 @@ Writes validated records to warehouse_data table using bulk operations.
 from pyspark.sql import DataFrame
 
 from src.core.models import WarehouseData
+from src.observability.lineage import LineageTracker
 from src.warehouse.connection import DatabaseConnectionPool
 from src.warehouse.upsert import WarehouseWriter as UpsertWriter
 
@@ -16,15 +17,21 @@ class BatchWarehouseWriter:
     Writes valid records from Spark DataFrame to warehouse in bulk.
     """
 
-    def __init__(self, pool: DatabaseConnectionPool):
+    def __init__(
+        self,
+        pool: DatabaseConnectionPool,
+        lineage_tracker: LineageTracker | None = None
+    ):
         """
         Initialize batch warehouse writer.
 
         Args:
             pool: Database connection pool
+            lineage_tracker: Optional lineage tracker for audit trail
         """
         self.pool = pool
         self.upsert_writer = UpsertWriter(pool)
+        self.lineage_tracker = lineage_tracker
 
     def write_dataframe(
         self,
@@ -72,6 +79,15 @@ class BatchWarehouseWriter:
 
         # Use upsert writer for bulk insert
         count = self.upsert_writer.upsert_batch(warehouse_records)
+
+        # Track warehouse writes in lineage
+        if self.lineage_tracker:
+            for record in warehouse_records:
+                self.lineage_tracker.track_warehouse_write(
+                    record_id=record.record_id,
+                    source_id=source_id,
+                    schema_version_id=schema_version_id
+                )
 
         return count
 

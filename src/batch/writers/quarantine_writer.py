@@ -9,6 +9,7 @@ from typing import Any
 from pyspark.sql import DataFrame
 
 from src.core.models import QuarantineRecord
+from src.observability.lineage import LineageTracker
 from src.warehouse.connection import DatabaseConnectionPool
 from src.warehouse.upsert import QuarantineWriter as UpsertQuarantineWriter
 
@@ -18,15 +19,21 @@ class BatchQuarantineWriter:
     Writes invalid records from Spark DataFrame to quarantine in bulk.
     """
 
-    def __init__(self, pool: DatabaseConnectionPool):
+    def __init__(
+        self,
+        pool: DatabaseConnectionPool,
+        lineage_tracker: LineageTracker | None = None
+    ):
         """
         Initialize batch quarantine writer.
 
         Args:
             pool: Database connection pool
+            lineage_tracker: Optional lineage tracker for audit trail
         """
         self.pool = pool
         self.quarantine_writer = UpsertQuarantineWriter(pool)
+        self.lineage_tracker = lineage_tracker
 
     def write_dataframe(
         self,
@@ -89,6 +96,25 @@ class BatchQuarantineWriter:
 
         # Use quarantine writer for bulk insert
         count = self.quarantine_writer.quarantine_batch(quarantine_records)
+
+        # Track quarantine events in lineage
+        if self.lineage_tracker:
+            for record in quarantine_records:
+                # Track the first failed rule (primary cause)
+                primary_rule = record.failed_rules[0] if record.failed_rules else "unknown"
+                primary_error = (
+                    record.error_messages[0]
+                    if record.error_messages
+                    else "Validation failed"
+                )
+
+                self.lineage_tracker.track_quarantine(
+                    record_id=record.record_id or "unknown",
+                    source_id=source_id,
+                    failed_rule=primary_rule,
+                    field_name=None,  # Could be extracted from error message if needed
+                    error_message=primary_error
+                )
 
         return count
 
