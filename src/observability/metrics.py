@@ -330,3 +330,61 @@ def observe_histogram(histogram: Histogram, value: float, **labels) -> None:
         **labels: Label values for the metric
     """
     histogram.labels(**labels).observe(value)
+
+
+# =======================
+# BATCH-SPECIFIC HELPERS
+# =======================
+
+def record_batch_processing(
+    source_id: str,
+    total_records: int,
+    valid_records: int,
+    invalid_records: int,
+    duplicate_records: int,
+    duration_seconds: float
+) -> None:
+    """
+    Record batch processing metrics.
+
+    Args:
+        source_id: Data source ID
+        total_records: Total records processed
+        valid_records: Valid records written to warehouse
+        invalid_records: Invalid records quarantined
+        duplicate_records: Duplicate records removed
+        duration_seconds: Processing duration in seconds
+    """
+    # Record counts
+    increment_counter(records_processed_total, valid_records, source_id=source_id, status="valid")
+    increment_counter(records_processed_total, invalid_records, source_id=source_id, status="invalid")
+
+    # Record batch size
+    observe_histogram(batch_size, total_records, source_id=source_id)
+
+    # Record duration
+    observe_histogram(processing_duration_seconds, duration_seconds, source_id=source_id, mode="batch")
+
+    # Calculate and record throughput
+    if duration_seconds > 0:
+        throughput = total_records / duration_seconds
+        set_gauge(throughput_records_per_second, throughput, source_id=source_id, mode="batch")
+
+    # Record duplicates
+    if duplicate_records > 0:
+        increment_counter(batches_processed_total, 1, source_id=source_id, status="has_duplicates")
+
+    # Mark batch as completed
+    increment_counter(batches_processed_total, 1, source_id=source_id, status="success")
+
+
+def record_validation_failure(source_id: str, rule_type: str, field_name: str) -> None:
+    """
+    Record a validation failure.
+
+    Args:
+        source_id: Data source ID
+        rule_type: Type of validation rule that failed
+        field_name: Name of field that failed validation
+    """
+    increment_counter(validation_failures_total, 1, source_id=source_id, rule_type=rule_type, field_name=field_name)
