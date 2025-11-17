@@ -1,18 +1,14 @@
 <!--
 Sync Impact Report:
-- Version: 0.0.0 → 1.0.0
-- Initial constitution creation for Dirty Spark data validation framework
-- Principles established:
-  1. Data Quality First
-  2. Dual-Mode Processing
-  3. Schema Flexibility & Evolution
-  4. Idempotency & Reliability
-  5. Observability & Debugging
-  6. Performance & Scalability
-  7. Type Safety & Validation
-  8. Test-Driven Development
-- Templates status: ⚠ pending review/updates for plan, spec, tasks templates
-- Follow-up: None - initial creation complete
+- Version: 1.0.0 → 1.1.0
+- Amendment: Remove technology stack constraints section
+- Rationale: Technology choices are feature-specific and belong in implementation
+  plans, not constitutional governance. Principles remain technology-agnostic.
+- Removed sections:
+  - Technology & Architecture Constraints (Database, Processing Stack, Deployment)
+- Core principles unchanged (all 8 principles intact)
+- Templates status: ✅ no updates required (principles unchanged)
+- Follow-up: Technology decisions delegated to /speckit.plan phase
 -->
 
 # Dirty Spark Data Validation Framework Constitution
@@ -123,32 +119,6 @@ Sync Impact Report:
 
 **Rationale**: Data pipelines are complex and error-prone. Comprehensive testing prevents regressions and validates correctness.
 
-## Technology & Architecture Constraints
-
-### Database Requirements
-
-- **Target Warehouse**: PostgreSQL 12+ for ACID guarantees and JSON support
-- **Connection Management**: Connection pooling (pgBouncer or application-level)
-- **Transaction Isolation**: Read Committed for batch, serializable for critical operations
-- **Schema Management**: Migrations via version-controlled SQL scripts
-- **Indexing Strategy**: Composite indexes on business keys for upsert performance
-
-### Data Processing Stack
-
-- **Language**: Python 3.9+ for rich ecosystem and type hints
-- **Batch Processing**: Pandas/Polars for in-memory, Dask/Ray for distributed
-- **Stream Processing**: Apache Kafka + Flink/Spark Streaming, or Kinesis
-- **Serialization**: JSON for flexibility, Avro/Parquet for performance
-- **Configuration**: YAML/TOML for validation rules, environment variables for secrets
-
-### Deployment & Operations
-
-- **Containerization**: Docker for reproducible environments
-- **Orchestration**: Kubernetes for stream processors, Airflow/Prefect for batch
-- **Monitoring**: Prometheus + Grafana for metrics, ELK/Loki for logs
-- **CI/CD**: Automated testing, linting, and deployment pipelines
-- **Infrastructure as Code**: Terraform or equivalent for reproducibility
-
 ## Development Workflow
 
 ### Code Review Requirements
@@ -199,4 +169,4 @@ This constitution is the authoritative guide for all development decisions. Amen
 - Complexity additions require clear justification tied to principles
 - When principles conflict, prioritize: Data Quality > Reliability > Performance
 
-**Version**: 1.0.0 | **Ratified**: 2025-11-17 | **Last Amended**: 2025-11-17
+**Version**: 1.1.0 | **Ratified**: 2025-11-17 | **Last Amended**: 2025-11-17
