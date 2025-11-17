@@ -69,7 +69,7 @@
 - [x] T034 Create src/core/rules/rule_config.py to load validation rules from YAML config
 - [x] T035 Create src/core/rules/rule_engine.py with ValidationEngine that runs all rules on a record
 - [x] T036 Create tests/unit/test_rule_engine.py to verify rule engine with multiple rules
-- [ ] T037 Create config/validation_rules.yaml with sample rules (transaction_id, amount, timestamp, email)
+- [x] T037 Create config/validation_rules.yaml with sample rules (transaction_id, amount, timestamp, email)
 - [x] T038 Create src/warehouse/schema_mgmt.py with DDL execution and table creation functions
 - [x] T039 Create src/warehouse/upsert.py with idempotent upsert using INSERT ... ON CONFLICT
 - [x] T040 Create tests/integration/test_warehouse_ops.py with testcontainers PostgreSQL to verify upsert idempotency
@@ -88,17 +88,17 @@
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation (TDD - NON-NEGOTIABLE)**
 
-- [ ] T041 [P] [US1] Create tests/fixtures/dirty_data.csv with intentionally dirty data (missing fields, wrong types, duplicates, nulls)
-- [ ] T042 [P] [US1] Create tests/e2e/test_dirty_csv_batch.py with end-to-end test: CSV → validation → warehouse + quarantine
-- [ ] T043 [P] [US1] Create tests/integration/test_batch_pipeline.py to verify batch processing with Spark (using pytest-spark)
+- [x] T041 [P] [US1] Create tests/fixtures/dirty_data.csv with intentionally dirty data (missing fields, wrong types, duplicates, nulls)
+- [x] T042 [P] [US1] Create tests/e2e/test_dirty_csv_batch.py with end-to-end test: CSV → validation → warehouse + quarantine
+- [x] T043 [P] [US1] Create tests/integration/test_batch_pipeline.py to verify batch processing with Spark (using pytest-spark)
 
 ### Implementation for User Story 1
 
-- [ ] T044 [P] [US1] Create src/core/schema/inference.py with Spark schema inference and confidence scoring
-- [ ] T045 [P] [US1] Create tests/unit/test_schema_inference.py with various CSV schemas and edge cases
-- [ ] T046 [US1] Create src/core/schema/registry.py to save/load schemas from schema_version table
-- [ ] T047 [US1] Create src/batch/readers/csv_reader.py to read CSV files using Spark with schema inference
-- [ ] T048 [US1] Create src/batch/readers/file_reader.py for generic file reading (CSV, JSON, Parquet)
+- [x] T044 [P] [US1] Create src/core/schema/inference.py with Spark schema inference and confidence scoring
+- [x] T045 [P] [US1] Create tests/unit/test_schema_inference.py with various CSV schemas and edge cases
+- [x] T046 [US1] Create src/core/schema/registry.py to save/load schemas from schema_version table
+- [x] T047 [US1] Create src/batch/readers/csv_reader.py to read CSV files using Spark with schema inference
+- [x] T048 [US1] Create src/batch/readers/file_reader.py for generic file reading (CSV, JSON, Parquet)
 - [ ] T049 [US1] Create src/batch/pipeline.py to orchestrate batch processing: read → validate → route → write
 - [ ] T050 [US1] Integrate ValidationEngine from Phase 2 into batch pipeline (apply rules to DataFrame)
 - [ ] T051 [US1] Create src/batch/writers/warehouse_writer.py to write valid records to warehouse_data table using bulk COPY
