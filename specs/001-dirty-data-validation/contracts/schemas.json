@@ -1,0 +1,539 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Dirty Data Validation Pipeline - Data Schemas",
+  "version": "1.0.0",
+  "description": "JSON Schema definitions for all data entities in the validation pipeline",
+
+  "definitions": {
+    "DataSource": {
+      "type": "object",
+      "description": "Represents an origin of data (CSV file, Kafka topic, API endpoint)",
+      "properties": {
+        "source_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255,
+          "description": "Unique identifier for the data source"
+        },
+        "source_type": {
+          "type": "string",
+          "enum": ["csv_file", "kafka_topic", "json_stream", "api_endpoint"],
+          "description": "Type of data source"
+        },
+        "schema_version_id": {
+          "type": ["integer", "null"],
+          "description": "Current active schema version (FK to SchemaVersion)"
+        },
+        "connection_info": {
+          "type": "object",
+          "description": "Connection details (varies by source_type)",
+          "oneOf": [
+            {
+              "description": "CSV file connection",
+              "properties": {
+                "file_path": {"type": "string"},
+                "delimiter": {"type": "string", "default": ","},
+                "header": {"type": "boolean", "default": true}
+              },
+              "required": ["file_path"]
+            },
+            {
+              "description": "Kafka topic connection",
+              "properties": {
+                "bootstrap_servers": {"type": "string"},
+                "topic": {"type": "string"},
+                "consumer_group": {"type": "string"}
+              },
+              "required": ["bootstrap_servers", "topic"]
+            },
+            {
+              "description": "JSON stream connection",
+              "properties": {
+                "stream_path": {"type": "string"},
+                "file_format": {"type": "string", "enum": ["json", "jsonl"]}
+              },
+              "required": ["stream_path"]
+            }
+          ]
+        },
+        "enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Whether source is actively being processed"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When source was registered"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Last configuration update"
+        }
+      },
+      "required": ["source_id", "source_type", "connection_info"]
+    },
+
+    "ValidationRule": {
+      "type": "object",
+      "description": "A configurable constraint applied to incoming data",
+      "properties": {
+        "rule_id": {
+          "type": "integer",
+          "description": "Auto-increment primary key"
+        },
+        "rule_name": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Human-readable name (e.g., 'require_transaction_id')"
+        },
+        "rule_type": {
+          "type": "string",
+          "enum": ["required_field", "type_check", "range", "regex", "custom"],
+          "description": "Type of validation rule"
+        },
+        "field_name": {
+          "type": "string",
+          "description": "Which field this rule applies to"
+        },
+        "parameters": {
+          "type": "object",
+          "description": "Rule-specific parameters",
+          "oneOf": [
+            {
+              "description": "Range validation params",
+              "properties": {
+                "min": {"type": "number"},
+                "max": {"type": "number"}
+              }
+            },
+            {
+              "description": "Regex validation params",
+              "properties": {
+                "pattern": {"type": "string"}
+              }
+            },
+            {
+              "description": "Type check params",
+              "properties": {
+                "expected_type": {
+                  "type": "string",
+                  "enum": ["string", "integer", "float", "boolean", "datetime", "date"]
+                }
+              }
+            },
+            {
+              "description": "Custom function params",
+              "properties": {
+                "function_name": {"type": "string"},
+                "args": {"type": "object"}
+              }
+            }
+          ]
+        },
+        "enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Whether rule is active"
+        },
+        "severity": {
+          "type": "string",
+          "enum": ["error", "warning"],
+          "default": "error",
+          "description": "error (quarantine) or warning (log only)"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["rule_name", "rule_type", "field_name"]
+    },
+
+    "DataRecord": {
+      "type": "object",
+      "description": "A single unit of data being processed (ephemeral)",
+      "properties": {
+        "record_id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Unique identifier for the record (business key)"
+        },
+        "source_id": {
+          "type": "string",
+          "description": "Which source this came from"
+        },
+        "raw_payload": {
+          "type": "object",
+          "description": "Original unmodified data"
+        },
+        "processed_payload": {
+          "type": ["object", "null"],
+          "description": "Data after transformations/coercions"
+        },
+        "validation_status": {
+          "type": "string",
+          "enum": ["pending", "valid", "invalid", "manual_review"],
+          "default": "pending",
+          "description": "Current validation state"
+        },
+        "processing_timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When record entered pipeline"
+        },
+        "batch_id": {
+          "type": ["string", "null"],
+          "description": "Batch identifier for grouping (batch mode)"
+        }
+      },
+      "required": ["record_id", "source_id", "raw_payload"]
+    },
+
+    "WarehouseData": {
+      "type": "object",
+      "description": "Clean, validated data stored in the warehouse",
+      "properties": {
+        "record_id": {
+          "type": "string",
+          "description": "Business key (must match DataRecord.record_id)"
+        },
+        "source_id": {
+          "type": "string",
+          "description": "Source of the record"
+        },
+        "data": {
+          "type": "object",
+          "description": "The actual validated data payload"
+        },
+        "schema_version_id": {
+          "type": ["integer", "null"],
+          "description": "Which schema version was used"
+        },
+        "processed_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When record was loaded"
+        },
+        "checksum": {
+          "type": ["string", "null"],
+          "description": "Data fingerprint for change detection"
+        }
+      },
+      "required": ["record_id", "source_id", "data"]
+    },
+
+    "QuarantineRecord": {
+      "type": "object",
+      "description": "Invalid records with detailed error context",
+      "properties": {
+        "quarantine_id": {
+          "type": "integer",
+          "description": "Auto-increment primary key"
+        },
+        "record_id": {
+          "type": ["string", "null"],
+          "description": "Original record_id (may be missing if malformed)"
+        },
+        "source_id": {
+          "type": "string",
+          "description": "Source of the invalid record"
+        },
+        "raw_payload": {
+          "type": "object",
+          "description": "Original data before validation"
+        },
+        "failed_rules": {
+          "type": "array",
+          "items": {"type": "string"},
+          "minItems": 1,
+          "description": "Array of rule names that failed"
+        },
+        "error_messages": {
+          "type": "array",
+          "items": {"type": "string"},
+          "minItems": 1,
+          "description": "Corresponding error messages"
+        },
+        "quarantined_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "reviewed": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether analyst has reviewed"
+        },
+        "reprocess_requested": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether to retry with updated rules"
+        },
+        "reprocessed_at": {
+          "type": ["string", "null"],
+          "format": "date-time",
+          "description": "When reprocessing occurred"
+        }
+      },
+      "required": ["source_id", "raw_payload", "failed_rules", "error_messages"]
+    },
+
+    "ValidationResult": {
+      "type": "object",
+      "description": "Outcome of validating a record (ephemeral, in-memory)",
+      "properties": {
+        "record_id": {
+          "type": "string",
+          "description": "Which record was validated"
+        },
+        "passed": {
+          "type": "boolean",
+          "description": "Overall validation status"
+        },
+        "passed_rules": {
+          "type": "array",
+          "items": {"type": "string"},
+          "default": [],
+          "description": "Rules that succeeded"
+        },
+        "failed_rules": {
+          "type": "array",
+          "items": {"type": "string"},
+          "default": [],
+          "description": "Rules that failed"
+        },
+        "transformations_applied": {
+          "type": "array",
+          "items": {"type": "string"},
+          "default": [],
+          "description": "List of transformations (e.g., 'date_format_normalized')"
+        },
+        "confidence_score": {
+          "type": ["number", "null"],
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "Schema inference confidence (0.0-1.0)"
+        }
+      },
+      "required": ["record_id", "passed"]
+    },
+
+    "SchemaVersion": {
+      "type": "object",
+      "description": "Snapshot of a data schema at a point in time",
+      "properties": {
+        "schema_id": {
+          "type": "integer",
+          "description": "Auto-increment primary key"
+        },
+        "source_id": {
+          "type": "string",
+          "description": "Which source this schema applies to"
+        },
+        "version": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Version number (increments with each change)"
+        },
+        "schema_definition": {
+          "type": "object",
+          "description": "Spark schema as JSON (fields, types, nullable)",
+          "properties": {
+            "fields": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": {"type": "string"},
+                  "type": {"type": "string"},
+                  "nullable": {"type": "boolean"},
+                  "metadata": {"type": "object"}
+                },
+                "required": ["name", "type"]
+              }
+            },
+            "type": {"type": "string", "const": "struct"}
+          },
+          "required": ["fields", "type"]
+        },
+        "inferred": {
+          "type": "boolean",
+          "default": true,
+          "description": "Whether schema was auto-inferred or manually defined"
+        },
+        "confidence": {
+          "type": ["number", "null"],
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "Inference confidence if auto-inferred (0.0-1.0)"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "deprecated_at": {
+          "type": ["string", "null"],
+          "format": "date-time",
+          "description": "When schema became obsolete"
+        }
+      },
+      "required": ["source_id", "version", "schema_definition"]
+    },
+
+    "AuditLog": {
+      "type": "object",
+      "description": "Lineage entry tracking data transformations",
+      "properties": {
+        "log_id": {
+          "type": "integer",
+          "description": "Auto-increment primary key"
+        },
+        "record_id": {
+          "type": "string",
+          "description": "Which record was transformed"
+        },
+        "source_id": {
+          "type": "string",
+          "description": "Source of the record"
+        },
+        "transformation_type": {
+          "type": "string",
+          "description": "Type of transformation",
+          "examples": ["type_coercion", "date_normalization", "null_replacement", "trim_whitespace"]
+        },
+        "field_name": {
+          "type": ["string", "null"],
+          "description": "Which field was affected"
+        },
+        "old_value": {
+          "type": ["string", "null"],
+          "description": "Original value (as string)"
+        },
+        "new_value": {
+          "type": ["string", "null"],
+          "description": "Transformed value (as string)"
+        },
+        "rule_applied": {
+          "type": ["string", "null"],
+          "description": "Which rule/logic caused the transformation"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["record_id", "source_id", "transformation_type"]
+    },
+
+    "BatchProcessingSummary": {
+      "type": "object",
+      "description": "Summary output from batch processing",
+      "properties": {
+        "batch_id": {"type": "string"},
+        "source_id": {"type": "string"},
+        "total_records": {"type": "integer", "minimum": 0},
+        "valid_records": {"type": "integer", "minimum": 0},
+        "invalid_records": {"type": "integer", "minimum": 0},
+        "processing_time_seconds": {"type": "number", "minimum": 0},
+        "throughput_records_per_second": {"type": "number", "minimum": 0},
+        "warehouse_records_written": {"type": "integer", "minimum": 0},
+        "quarantine_records_written": {"type": "integer", "minimum": 0},
+        "schema_version_used": {"type": "integer"},
+        "transformations_applied": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "transformation_type": {"type": "string"},
+              "count": {"type": "integer"}
+            }
+          }
+        },
+        "validation_failures_by_rule": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "rule_name": {"type": "string"},
+              "failure_count": {"type": "integer"}
+            }
+          }
+        },
+        "started_at": {"type": "string", "format": "date-time"},
+        "completed_at": {"type": "string", "format": "date-time"}
+      },
+      "required": ["total_records", "valid_records", "invalid_records"]
+    },
+
+    "StreamingStatus": {
+      "type": "object",
+      "description": "Status of a running streaming query",
+      "properties": {
+        "query_id": {"type": "string"},
+        "source_id": {"type": "string"},
+        "status": {"type": "string", "enum": ["running", "stopped", "failed"]},
+        "checkpoint_location": {"type": "string"},
+        "records_processed": {"type": "integer", "minimum": 0},
+        "current_offset": {"type": "string"},
+        "started_at": {"type": "string", "format": "date-time"},
+        "last_progress_timestamp": {"type": "string", "format": "date-time"},
+        "error_message": {"type": ["string", "null"]}
+      },
+      "required": ["query_id", "status"]
+    }
+  },
+
+  "examples": {
+    "DataSource_CSV": {
+      "source_id": "legacy_transactions_csv",
+      "source_type": "csv_file",
+      "schema_version_id": 1,
+      "connection_info": {
+        "file_path": "/data/input/transactions.csv",
+        "delimiter": ",",
+        "header": true
+      },
+      "enabled": true
+    },
+
+    "ValidationRule_Required": {
+      "rule_name": "require_transaction_id",
+      "rule_type": "required_field",
+      "field_name": "transaction_id",
+      "enabled": true,
+      "severity": "error"
+    },
+
+    "ValidationRule_Range": {
+      "rule_name": "amount_range_check",
+      "rule_type": "range",
+      "field_name": "amount",
+      "parameters": {
+        "min": 0.01,
+        "max": 1000000.00
+      },
+      "enabled": true,
+      "severity": "error"
+    },
+
+    "QuarantineRecord_Example": {
+      "quarantine_id": 123,
+      "record_id": "TXN0000000001",
+      "source_id": "legacy_transactions_csv",
+      "raw_payload": {
+        "transaction_id": "TXN0000000001",
+        "amount": "invalid_amount",
+        "timestamp": "2025-11-17T10:00:00Z"
+      },
+      "failed_rules": ["amount_type_check", "amount_range_check"],
+      "error_messages": [
+        "Field 'amount' expected type float, got string",
+        "Cannot validate range for non-numeric value"
+      ],
+      "quarantined_at": "2025-11-17T10:05:00Z",
+      "reviewed": false,
+      "reprocess_requested": false
+    }
+  }
+}
