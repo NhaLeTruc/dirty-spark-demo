@@ -22,6 +22,10 @@ from src.observability.logger import get_logger
 
 logger = get_logger(__name__)
 
+from src.observability.logger import get_logger
+
+logger = get_logger(__name__)
+
 
 class SchemaInferrer:
     """
