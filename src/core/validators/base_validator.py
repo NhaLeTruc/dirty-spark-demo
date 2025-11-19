@@ -5,7 +5,7 @@ All validators must inherit from BaseValidator and implement the validate() meth
 """
 
 from abc import ABC, abstractmethod
-from typing import Any, Dict
+from typing import Any
 
 
 class ValidationError(Exception):
@@ -26,7 +26,7 @@ class BaseValidator(ABC):
     (required_field, type_check, range, regex, custom).
     """
 
-    def __init__(self, field_name: str, parameters: Dict[str, Any] | None = None):
+    def __init__(self, field_name: str, parameters: dict[str, Any] | None = None):
         """
         Initialize validator.
 
@@ -38,7 +38,7 @@ class BaseValidator(ABC):
         self.parameters = parameters or {}
 
     @abstractmethod
-    def validate(self, value: Any, record: Dict[str, Any]) -> None:
+    def validate(self, value: Any, record: dict[str, Any]) -> None:
         """
         Validate a value against this rule.
 

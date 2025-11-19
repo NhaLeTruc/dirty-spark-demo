@@ -2,9 +2,10 @@
 QuarantineRecord model representing invalid records with detailed error context.
 """
 
-from pydantic import BaseModel, Field, field_validator
-from typing import Dict, Any, List
 from datetime import datetime
+from typing import Any
+
+from pydantic import BaseModel, Field, field_validator
 
 
 class QuarantineRecord(BaseModel):
@@ -27,9 +28,9 @@ class QuarantineRecord(BaseModel):
     quarantine_id: int | None = None
     record_id: str | None = None
     source_id: str
-    raw_payload: Dict[str, Any]
-    failed_rules: List[str] = Field(..., min_length=1)
-    error_messages: List[str] = Field(..., min_length=1)
+    raw_payload: dict[str, Any]
+    failed_rules: list[str] = Field(..., min_length=1)
+    error_messages: list[str] = Field(..., min_length=1)
     quarantined_at: datetime = Field(default_factory=datetime.utcnow)
     reviewed: bool = False
     reprocess_requested: bool = False

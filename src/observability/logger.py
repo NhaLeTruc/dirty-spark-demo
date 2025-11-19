@@ -7,9 +7,8 @@ using python-json-logger for easy parsing and analysis.
 import logging
 import os
 import sys
-from typing import Optional
-from pythonjsonlogger import jsonlogger
 
+from pythonjsonlogger import jsonlogger
 
 # Log level mapping
 LOG_LEVELS = {
@@ -63,7 +62,7 @@ class CustomJsonFormatter(jsonlogger.JsonFormatter):
 
 def setup_logger(
     name: str = "dirty-spark-pipeline",
-    level: Optional[str] = None,
+    level: str | None = None,
     format_type: str = "json",
 ) -> logging.Logger:
     """
@@ -134,7 +133,7 @@ def get_logger(name: str = "dirty-spark-pipeline") -> logging.Logger:
 
 
 # Global logger instance
-_default_logger: Optional[logging.Logger] = None
+_default_logger: logging.Logger | None = None
 
 
 def get_default_logger() -> logging.Logger:
@@ -187,7 +186,7 @@ class log_operation:
             pass
     """
 
-    def __init__(self, operation_name: str, logger: Optional[logging.Logger] = None, **extra_fields):
+    def __init__(self, operation_name: str, logger: logging.Logger | None = None, **extra_fields):
         """
         Initialize operation logger
 

@@ -5,17 +5,12 @@ Writes validated records to PostgreSQL warehouse using foreachBatch.
 """
 
 import logging
-from typing import List, Dict, Any
-import json
 
 from pyspark.sql import DataFrame
-from psycopg.rows import dict_row
 
+from src.observability.metrics import MetricsCollector
 from src.warehouse.connection import get_connection
 from src.warehouse.upsert import upsert_warehouse_data
-from src.core.models.warehouse_data import WarehouseData
-from src.observability.metrics import MetricsCollector
-from src.observability.lineage import log_transformation
 
 logger = logging.getLogger(__name__)
 
@@ -146,7 +141,7 @@ class WarehouseSink:
             )
             raise
 
-    def get_stats(self) -> Dict[str, int]:
+    def get_stats(self) -> dict[str, int]:
         """
         Get sink statistics.
 

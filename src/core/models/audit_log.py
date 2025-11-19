@@ -2,8 +2,9 @@
 AuditLog model representing lineage entry tracking data transformations.
 """
 
-from pydantic import BaseModel, Field
 from datetime import datetime
+
+from pydantic import BaseModel, Field
 
 
 class AuditLog(BaseModel):

@@ -4,11 +4,13 @@ Idempotent upsert operations for warehouse data.
 Implements INSERT ... ON CONFLICT UPDATE for reliable, idempotent writes.
 """
 
-from typing import List, Dict, Any
 import hashlib
 import json
+from typing import Any
+
+from src.core.models import QuarantineRecord, WarehouseData
+
 from .connection import DatabaseConnectionPool
-from src.core.models import WarehouseData, QuarantineRecord
 
 
 class WarehouseWriter:
@@ -66,7 +68,7 @@ class WarehouseWriter:
             )
         )
 
-    def upsert_batch(self, records: List[WarehouseData]) -> int:
+    def upsert_batch(self, records: list[WarehouseData]) -> int:
         """
         Upsert a batch of warehouse records.
 
@@ -114,7 +116,7 @@ class WarehouseWriter:
 
                 return len(records)
 
-    def _calculate_checksum(self, data: Dict[str, Any]) -> str:
+    def _calculate_checksum(self, data: dict[str, Any]) -> str:
         """
         Calculate MD5 checksum of data payload.
 
@@ -177,7 +179,7 @@ class QuarantineWriter:
 
         return result[0]["quarantine_id"]
 
-    def quarantine_batch(self, records: List[QuarantineRecord]) -> int:
+    def quarantine_batch(self, records: list[QuarantineRecord]) -> int:
         """
         Insert a batch of records into quarantine.
 
@@ -219,7 +221,7 @@ class QuarantineWriter:
 
                 return len(records)
 
-    def get_quarantine_stats(self, source_id: str | None = None) -> Dict[str, Any]:
+    def get_quarantine_stats(self, source_id: str | None = None) -> dict[str, Any]:
         """
         Get quarantine statistics.
 

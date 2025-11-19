@@ -4,17 +4,19 @@ Unit tests for validation rules.
 Includes property-based testing with hypothesis for validators.
 """
 
-import pytest
 import re
-from hypothesis import given, strategies as st
+
+import pytest
+from hypothesis import given
+from hypothesis import strategies as st
 
 from src.core.validators import (
-    ValidationError,
-    RequiredFieldValidator,
-    TypeValidator,
+    CustomValidator,
     RangeValidator,
     RegexValidator,
-    CustomValidator,
+    RequiredFieldValidator,
+    TypeValidator,
+    ValidationError,
 )
 
 

@@ -5,7 +5,6 @@ This module provides functions to insert and query audit log entries
 for compliance and lineage tracking purposes.
 """
 
-from datetime import datetime
 from typing import Any
 
 import psycopg

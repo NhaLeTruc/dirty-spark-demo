@@ -5,9 +5,10 @@ Loads validation rules from YAML files and provides utilities
 for managing rule configurations.
 """
 
-import yaml
 from pathlib import Path
-from typing import Dict, List, Any
+from typing import Any
+
+import yaml
 
 
 class RuleConfigLoader:
@@ -46,7 +47,7 @@ class RuleConfigLoader:
         if not self.config_path.exists():
             raise FileNotFoundError(f"Rule configuration file not found: {config_path}")
 
-    def load_rules(self) -> List[Dict[str, Any]]:
+    def load_rules(self) -> list[dict[str, Any]]:
         """
         Load and parse validation rules from YAML file.
 
@@ -56,7 +57,7 @@ class RuleConfigLoader:
         Raises:
             ValueError: If YAML is invalid or missing required fields
         """
-        with open(self.config_path, "r") as f:
+        with open(self.config_path) as f:
             config = yaml.safe_load(f)
 
         if not config or "rules" not in config:
@@ -75,7 +76,7 @@ class RuleConfigLoader:
 
         return rules
 
-    def _parse_rule(self, field_name: str, rule_def: Dict[str, Any], idx: int) -> Dict[str, Any]:
+    def _parse_rule(self, field_name: str, rule_def: dict[str, Any], idx: int) -> dict[str, Any]:
         """
         Parse a single rule definition.
 
@@ -126,7 +127,7 @@ class RuleConfigBuilder:
 
     def __init__(self):
         """Initialize empty rule configuration."""
-        self.rules: List[Dict[str, Any]] = []
+        self.rules: list[dict[str, Any]] = []
 
     def add_required_field(self, field_name: str, allow_empty_string: bool = False) -> "RuleConfigBuilder":
         """Add a required field rule."""
@@ -192,6 +193,6 @@ class RuleConfigBuilder:
         })
         return self
 
-    def build(self) -> List[Dict[str, Any]]:
+    def build(self) -> list[dict[str, Any]]:
         """Build and return the rule configuration."""
         return self.rules

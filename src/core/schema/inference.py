@@ -4,10 +4,23 @@ Schema inference for data sources using Spark.
 Automatically infers schema from CSV/JSON files with confidence scoring.
 """
 
-from typing import Dict, Any, Tuple
-from pyspark.sql import SparkSession, DataFrame
-from pyspark.sql.types import StructType, StructField, StringType, DoubleType, IntegerType, TimestampType, BooleanType
 import re
+from typing import Any
+
+from pyspark.sql import DataFrame, SparkSession
+from pyspark.sql.types import (
+    BooleanType,
+    DoubleType,
+    IntegerType,
+    StringType,
+    StructField,
+    StructType,
+    TimestampType,
+)
+
+from src.observability.logger import get_logger
+
+logger = get_logger(__name__)
 
 from src.observability.logger import get_logger
 
@@ -36,7 +49,7 @@ class SchemaInferrer:
         file_path: str,
         sample_size: int = 1000,
         has_header: bool = True
-    ) -> Tuple[StructType, float]:
+    ) -> tuple[StructType, float]:
         """
         Infer schema from CSV file.
 
@@ -68,7 +81,7 @@ class SchemaInferrer:
         self,
         df: DataFrame,
         sample_fraction: float = 0.1
-    ) -> Tuple[StructType, float]:
+    ) -> tuple[StructType, float]:
         """
         Infer schema from existing DataFrame.
 
@@ -172,7 +185,7 @@ class SchemaInferrer:
         # Meaningful names get full score
         return 1.0
 
-    def schema_to_dict(self, schema: StructType) -> Dict[str, Any]:
+    def schema_to_dict(self, schema: StructType) -> dict[str, Any]:
         """
         Convert Spark schema to dictionary format.
 
@@ -193,7 +206,7 @@ class SchemaInferrer:
             ]
         }
 
-    def dict_to_schema(self, schema_dict: Dict[str, Any]) -> StructType:
+    def dict_to_schema(self, schema_dict: dict[str, Any]) -> StructType:
         """
         Convert dictionary to Spark schema.
 

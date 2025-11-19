@@ -10,7 +10,7 @@ from typing import Any
 
 from src.core.models.audit_log import AuditLog
 from src.observability.logger import get_logger
-from src.warehouse.audit import insert_audit_log, insert_audit_logs_batch
+from src.warehouse.audit import insert_audit_logs_batch
 from src.warehouse.connection import DatabaseConnectionPool
 
 logger = get_logger(__name__)

@@ -188,22 +188,22 @@
 
 ### Tests for User Story 3 ⚠️
 
-- [ ] T093 [P] [US3] Create tests/e2e/test_reprocessing.py to verify reprocessing workflow end-to-end
-- [ ] T094 [P] [US3] Create tests/integration/test_quarantine.py to verify quarantine queries and updates
+- [x] T093 [P] [US3] Create tests/e2e/test_reprocessing.py to verify reprocessing workflow end-to-end
+- [x] T094 [P] [US3] Create tests/integration/test_quarantine.py to verify quarantine queries and updates
 
 ### Implementation for User Story 3
 
-- [ ] T095 [P] [US3] Add "quarantine-review" command to admin CLI to display quarantined records grouped by error type
-- [ ] T096 [US3] Add quarantine filtering by source_id, date range, error type in admin CLI
-- [ ] T097 [US3] Add quarantine statistics query (count by error type, top failed rules)
-- [ ] T098 [US3] Add "add-rule" command to admin CLI to insert validation rules into validation_rule table
-- [ ] T099 [US3] Add "update-rule" command to admin CLI to modify existing rules
-- [ ] T100 [US3] Add "disable-rule" command to admin CLI to set enabled=false
-- [ ] T101 [US3] Create src/batch/reprocess.py to fetch quarantine records and re-run validation with updated rules
-- [ ] T102 [US3] Add "reprocess" command to admin CLI with --source and --quarantine-ids options
-- [ ] T103 [US3] Add reprocessing metrics (reprocessed_count, success_rate) to metrics.py
-- [ ] T104 [US3] Add "mark-reviewed" command to admin CLI to set reviewed=true for quarantine records
-- [ ] T105 [US3] Run tests/e2e/test_reprocessing.py and verify records move from quarantine to warehouse
+- [x] T095 [P] [US3] Add "quarantine-review" command to admin CLI to display quarantined records grouped by error type
+- [x] T096 [US3] Add quarantine filtering by source_id, date range, error type in admin CLI
+- [x] T097 [US3] Add quarantine statistics query (count by error type, top failed rules)
+- [x] T098 [US3] Add "add-rule" command to admin CLI to insert validation rules into validation_rule table
+- [x] T099 [US3] Add "update-rule" command to admin CLI to modify existing rules
+- [x] T100 [US3] Add "disable-rule" command to admin CLI to set enabled=false
+- [x] T101 [US3] Create src/batch/reprocess.py to fetch quarantine records and re-run validation with updated rules
+- [x] T102 [US3] Add "reprocess" command to admin CLI with --source and --quarantine-ids options
+- [x] T103 [US3] Add reprocessing metrics (reprocessed_count, success_rate) to metrics.py
+- [x] T104 [US3] Add "mark-reviewed" command to admin CLI to set reviewed=true for quarantine records
+- [x] T105 [US3] Run tests/e2e/test_reprocessing.py and verify records move from quarantine to warehouse
 
 **Checkpoint**: All user stories should now be independently functional and tested
 
@@ -213,21 +213,21 @@
 
 **Purpose**: Improvements that affect multiple user stories
 
-- [ ] T106 [P] Create config/validation-rules-example.yaml with comprehensive rule examples for documentation
+- [x] T106 [P] Create config/validation-rules-example.yaml with comprehensive rule examples for documentation
 - [ ] T107 [P] Add docstrings to all public functions and classes (Google style)
-- [ ] T108 [P] Run black formatter on entire codebase
-- [ ] T109 [P] Run ruff linter and fix all warnings
-- [ ] T110 [P] Run mypy type checker and fix all type errors
-- [ ] T111 [P] Add error handling and retry logic for database connection failures
-- [ ] T112 [P] Add graceful shutdown for streaming pipelines (handle SIGTERM/SIGINT)
-- [ ] T113 Create .github/workflows/ci.yml with pytest, linting, type checking on every push
-- [ ] T114 Run pytest with coverage report (pytest --cov=src --cov-report=html)
-- [ ] T115 Verify coverage >80% for all modules
+- [x] T108 [P] Run black formatter on entire codebase
+- [x] T109 [P] Run ruff linter and fix all warnings
+- [ ] T110 [P] Run mypy type checker and fix all type errors (90+ errors remain due to strict settings)
+- [x] T111 [P] Add error handling and retry logic for database connection failures
+- [x] T112 [P] Add graceful shutdown for streaming pipelines (handle SIGTERM/SIGINT)
+- [x] T113 Create .github/workflows/ci.yml with pytest, linting, type checking on every push
+- [x] T114 Run pytest with coverage report (pytest --cov=src --cov-report=html)
+- [ ] T115 Verify coverage >80% for all modules (current: 38.65% - many streaming features intentionally skipped)
 - [ ] T116 [P] Add performance benchmarks for batch processing (measure throughput with 100K records)
 - [ ] T117 [P] Add performance benchmarks for streaming (measure latency with event bursts)
 - [ ] T118 Create tests/fixtures/large_dataset.csv with 100K+ records for performance testing
 - [ ] T119 Validate quickstart.md instructions work end-to-end on clean environment
-- [ ] T120 Create CONTRIBUTING.md with development guidelines
+- [x] T120 Create CONTRIBUTING.md with development guidelines
 
 ---
 

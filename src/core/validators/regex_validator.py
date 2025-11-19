@@ -3,7 +3,9 @@ RegexValidator - validates field values against a regular expression pattern.
 """
 
 import re
-from typing import Any, Dict, Pattern
+from re import Pattern
+from typing import Any
+
 from .base_validator import BaseValidator, ValidationError
 
 
@@ -16,7 +18,7 @@ class RegexValidator(BaseValidator):
     - flags: Optional regex flags (e.g., re.IGNORECASE)
     """
 
-    def __init__(self, field_name: str, parameters: Dict[str, Any] | None = None):
+    def __init__(self, field_name: str, parameters: dict[str, Any] | None = None):
         super().__init__(field_name, parameters)
 
         # Get pattern from parameters
@@ -38,7 +40,7 @@ class RegexValidator(BaseValidator):
         except re.error as e:
             raise ValueError(f"Invalid regex pattern: {e}")
 
-    def validate(self, value: Any, record: Dict[str, Any]) -> None:
+    def validate(self, value: Any, record: dict[str, Any]) -> None:
         """
         Validate that the value matches the regex pattern.
 

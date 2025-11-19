@@ -5,20 +5,17 @@ Handles schema changes over time with backward compatibility checks.
 """
 
 import logging
-from typing import List, Dict, Any, Optional, Tuple
 from datetime import datetime
+from typing import Any
 
 from pyspark.sql.types import (
-    StructType,
-    StructField,
     DataType,
-    StringType,
-    IntegerType,
-    LongType,
     DoubleType,
     FloatType,
-    BooleanType,
-    TimestampType,
+    IntegerType,
+    LongType,
+    StringType,
+    StructType,
 )
 
 from src.core.models.schema_version import SchemaVersion
@@ -50,14 +47,14 @@ class SchemaEvolutionManager:
 
     def __init__(self):
         """Initialize schema evolution manager."""
-        self.schema_history: List[SchemaVersion] = []
+        self.schema_history: list[SchemaVersion] = []
 
     def merge_schemas(
         self,
         old_schema: StructType,
         new_schema: StructType,
         allow_type_changes: bool = False,
-    ) -> Tuple[StructType, List[str]]:
+    ) -> tuple[StructType, list[str]]:
         """
         Merge two schemas, adding new fields from new_schema.
 
@@ -174,7 +171,7 @@ class SchemaEvolutionManager:
         self,
         old_schema: StructType,
         new_schema: StructType
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Detect all changes between two schemas.
 
@@ -252,7 +249,7 @@ class SchemaEvolutionManager:
         schema: StructType,
         version: int,
         inferred: bool = True,
-        confidence: Optional[float] = None,
+        confidence: float | None = None,
     ) -> SchemaVersion:
         """
         Create a new schema version.
@@ -312,7 +309,7 @@ def merge_streaming_schemas(
     current_schema: StructType,
     incoming_schema: StructType,
     source_id: str,
-) -> Tuple[StructType, bool, List[str]]:
+) -> tuple[StructType, bool, list[str]]:
     """
     Merge schemas in streaming context with safety checks.
 
@@ -339,8 +336,8 @@ def merge_streaming_schemas(
                 f"{changes_detected}"
             )
             raise SchemaEvolutionError(
-                f"Breaking changes not allowed in streaming: "
-                f"removed fields or incompatible type changes"
+                "Breaking changes not allowed in streaming: "
+                "removed fields or incompatible type changes"
             )
 
         # Merge schemas (allow compatible type changes)

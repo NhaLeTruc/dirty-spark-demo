@@ -4,17 +4,16 @@ Validation integration for Spark Structured Streaming.
 Adapts the core RuleEngine to work with streaming DataFrames.
 """
 
-import logging
-from typing import Dict, Any, Iterator
 import json
+import logging
+from typing import Any
 
 from pyspark.sql import DataFrame
-from pyspark.sql.functions import udf, struct, col, to_json
-from pyspark.sql.types import StringType, BooleanType, ArrayType, StructType, StructField
+from pyspark.sql.functions import col, struct, to_json, udf
+from pyspark.sql.types import ArrayType, StringType, StructField, StructType
 
-from src.core.rules.rule_engine import RuleEngine
 from src.core.models.data_record import DataRecord
-from src.core.models.validation_result import ValidationResult
+from src.core.rules.rule_engine import RuleEngine
 
 logger = logging.getLogger(__name__)
 
@@ -30,7 +29,7 @@ def create_validation_udf(rule_engine: RuleEngine):
         Spark UDF that validates records and returns validation status
     """
 
-    def validate_row(raw_payload_json: str, record_id: str, source_id: str) -> Dict[str, Any]:
+    def validate_row(raw_payload_json: str, record_id: str, source_id: str) -> dict[str, Any]:
         """
         Validate a single row.
 
@@ -264,7 +263,7 @@ class StreamValidationHandler:
             self.validation_errors += 1
             raise
 
-    def get_metrics(self) -> Dict[str, int]:
+    def get_metrics(self) -> dict[str, int]:
         """
         Get validation metrics.
 

@@ -2,9 +2,10 @@
 DataSource model representing a data origin (CSV file, Kafka topic, API endpoint).
 """
 
-from pydantic import BaseModel, Field
-from typing import Literal, Dict, Any
 from datetime import datetime
+from typing import Any, Literal
+
+from pydantic import BaseModel, Field
 
 
 class DataSource(BaseModel):
@@ -24,7 +25,7 @@ class DataSource(BaseModel):
     source_id: str = Field(..., min_length=1, max_length=255)
     source_type: Literal["csv_file", "kafka_topic", "json_stream", "api_endpoint"]
     schema_version_id: int | None = None
-    connection_info: Dict[str, Any]
+    connection_info: dict[str, Any]
     enabled: bool = True
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)

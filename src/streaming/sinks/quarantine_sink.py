@@ -4,15 +4,13 @@ Quarantine sink for streaming invalid records.
 Writes invalid records to PostgreSQL quarantine table using foreachBatch.
 """
 
-import logging
-from typing import List, Dict, Any
 import json
+import logging
 
 from pyspark.sql import DataFrame
-from psycopg.rows import dict_row
 
-from src.warehouse.connection import get_connection
 from src.observability.metrics import MetricsCollector
+from src.warehouse.connection import get_connection
 
 logger = logging.getLogger(__name__)
 
@@ -160,7 +158,7 @@ class QuarantineSink:
             logger.error(f"Failed to write batch {batch_id} to quarantine: {e}", exc_info=True)
             raise
 
-    def get_stats(self) -> Dict[str, int]:
+    def get_stats(self) -> dict[str, int]:
         """
         Get sink statistics.
 

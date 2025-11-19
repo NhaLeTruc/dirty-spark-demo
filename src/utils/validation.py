@@ -7,7 +7,6 @@ and prevent injection attacks.
 """
 
 import re
-from typing import Optional
 
 
 class ValidationError(ValueError):

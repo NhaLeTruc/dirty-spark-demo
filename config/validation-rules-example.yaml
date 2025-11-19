@@ -1,0 +1,354 @@
+# Validation Rules Example Configuration
+# This file demonstrates comprehensive validation rule examples for the data validation pipeline
+# Copy this to validation_rules.yaml and customize for your data sources
+
+# =======================
+# TRANSACTION DATA RULES
+# =======================
+
+transaction_rules:
+  - rule_name: "transaction_id_required"
+    rule_type: "required_field"
+    field_name: "transaction_id"
+    severity: "error"
+    enabled: true
+    description: "Transaction ID must be present"
+
+  - rule_name: "transaction_id_format"
+    rule_type: "regex"
+    field_name: "transaction_id"
+    parameters:
+      pattern: "^TXN[0-9]{6,10}$"
+    severity: "error"
+    enabled: true
+    description: "Transaction ID must match format TXN followed by 6-10 digits"
+
+  - rule_name: "amount_required"
+    rule_type: "required_field"
+    field_name: "amount"
+    severity: "error"
+    enabled: true
+    description: "Amount must be present"
+
+  - rule_name: "amount_type_check"
+    rule_type: "type_check"
+    field_name: "amount"
+    parameters:
+      expected_type: "float"
+      allow_coercion: true
+    severity: "error"
+    enabled: true
+    description: "Amount must be numeric (float)"
+
+  - rule_name: "amount_range"
+    rule_type: "range"
+    field_name: "amount"
+    parameters:
+      min: 0.01
+      max: 1000000.00
+    severity: "error"
+    enabled: true
+    description: "Amount must be between $0.01 and $1,000,000"
+
+  - rule_name: "amount_positive"
+    rule_type: "custom"
+    field_name: "amount"
+    parameters:
+      expression: "value > 0"
+      error_message: "Amount must be positive"
+    severity: "error"
+    enabled: true
+    description: "Amount must be greater than zero"
+
+  - rule_name: "timestamp_required"
+    rule_type: "required_field"
+    field_name: "timestamp"
+    severity: "error"
+    enabled: true
+    description: "Timestamp must be present"
+
+  - rule_name: "timestamp_format"
+    rule_type: "type_check"
+    field_name: "timestamp"
+    parameters:
+      expected_type: "datetime"
+      date_format: "%Y-%m-%dT%H:%M:%SZ"
+      allow_coercion: true
+    severity: "error"
+    enabled: true
+    description: "Timestamp must be in ISO 8601 format"
+
+  - rule_name: "timestamp_not_future"
+    rule_type: "custom"
+    field_name: "timestamp"
+    parameters:
+      expression: "value <= NOW()"
+      error_message: "Timestamp cannot be in the future"
+    severity: "error"
+    enabled: true
+    description: "Timestamp must not be in the future"
+
+  - rule_name: "currency_code_valid"
+    rule_type: "regex"
+    field_name: "currency_code"
+    parameters:
+      pattern: "^(USD|EUR|GBP|JPY|CAD|AUD|CHF)$"
+    severity: "error"
+    enabled: true
+    description: "Currency code must be one of: USD, EUR, GBP, JPY, CAD, AUD, CHF"
+
+# =======================
+# USER DATA RULES
+# =======================
+
+user_rules:
+  - rule_name: "email_required"
+    rule_type: "required_field"
+    field_name: "email"
+    severity: "error"
+    enabled: true
+    description: "Email must be present"
+
+  - rule_name: "email_format"
+    rule_type: "regex"
+    field_name: "email"
+    parameters:
+      pattern: "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
+    severity: "error"
+    enabled: true
+    description: "Email must be in valid format"
+
+  - rule_name: "age_range"
+    rule_type: "range"
+    field_name: "age"
+    parameters:
+      min: 18
+      max: 120
+    severity: "warning"
+    enabled: true
+    description: "Age should be between 18 and 120"
+
+  - rule_name: "phone_format"
+    rule_type: "regex"
+    field_name: "phone"
+    parameters:
+      pattern: "^\\+?[1-9]\\d{1,14}$"  # E.164 format
+    severity: "warning"
+    enabled: true
+    description: "Phone number should be in E.164 format"
+
+  - rule_name: "country_code_valid"
+    rule_type: "regex"
+    field_name: "country_code"
+    parameters:
+      pattern: "^[A-Z]{2}$"
+    severity: "error"
+    enabled: true
+    description: "Country code must be 2-letter ISO code"
+
+# =======================
+# PRODUCT DATA RULES
+# =======================
+
+product_rules:
+  - rule_name: "sku_required"
+    rule_type: "required_field"
+    field_name: "sku"
+    severity: "error"
+    enabled: true
+    description: "SKU must be present"
+
+  - rule_name: "sku_format"
+    rule_type: "regex"
+    field_name: "sku"
+    parameters:
+      pattern: "^[A-Z]{3}-[0-9]{5}$"
+    severity: "error"
+    enabled: true
+    description: "SKU must match format XXX-12345"
+
+  - rule_name: "price_positive"
+    rule_type: "range"
+    field_name: "price"
+    parameters:
+      min: 0.00
+      max: 100000.00
+    severity: "error"
+    enabled: true
+    description: "Price must be between $0 and $100,000"
+
+  - rule_name: "quantity_positive"
+    rule_type: "range"
+    field_name: "quantity"
+    parameters:
+      min: 0
+      max: 999999
+    severity: "error"
+    enabled: true
+    description: "Quantity must be between 0 and 999,999"
+
+  - rule_name: "category_valid"
+    rule_type: "custom"
+    field_name: "category"
+    parameters:
+      expression: "value IN ('Electronics', 'Clothing', 'Food', 'Books', 'Home', 'Other')"
+      error_message: "Category must be one of the predefined categories"
+    severity: "warning"
+    enabled: true
+    description: "Category should be from predefined list"
+
+# =======================
+# SENSOR DATA RULES
+# =======================
+
+sensor_rules:
+  - rule_name: "sensor_id_required"
+    rule_type: "required_field"
+    field_name: "sensor_id"
+    severity: "error"
+    enabled: true
+    description: "Sensor ID must be present"
+
+  - rule_name: "sensor_id_format"
+    rule_type: "regex"
+    field_name: "sensor_id"
+    parameters:
+      pattern: "^SENSOR-[0-9]{4}$"
+    severity: "error"
+    enabled: true
+    description: "Sensor ID must match format SENSOR-####"
+
+  - rule_name: "temperature_range"
+    rule_type: "range"
+    field_name: "temperature"
+    parameters:
+      min: -50.0
+      max: 150.0
+    severity: "warning"
+    enabled: true
+    description: "Temperature should be between -50°C and 150°C"
+
+  - rule_name: "humidity_range"
+    rule_type: "range"
+    field_name: "humidity"
+    parameters:
+      min: 0.0
+      max: 100.0
+    severity: "error"
+    enabled: true
+    description: "Humidity must be between 0% and 100%"
+
+  - rule_name: "reading_timestamp_format"
+    rule_type: "type_check"
+    field_name: "reading_timestamp"
+    parameters:
+      expected_type: "datetime"
+      allow_coercion: true
+    severity: "error"
+    enabled: true
+    description: "Reading timestamp must be datetime"
+
+# =======================
+# CUSTOM VALIDATION RULES
+# =======================
+
+custom_rules:
+  - rule_name: "conditional_field_check"
+    rule_type: "custom"
+    field_name: "shipping_address"
+    parameters:
+      expression: "IF order_type = 'delivery' THEN shipping_address IS NOT NULL"
+      error_message: "Shipping address required for delivery orders"
+    severity: "error"
+    enabled: true
+    description: "Conditional validation based on order type"
+
+  - rule_name: "cross_field_validation"
+    rule_type: "custom"
+    field_name: "end_date"
+    parameters:
+      expression: "end_date >= start_date"
+      error_message: "End date must be after start date"
+    severity: "error"
+    enabled: true
+    description: "Cross-field date validation"
+
+  - rule_name: "calculated_field_check"
+    rule_type: "custom"
+    field_name: "total_amount"
+    parameters:
+      expression: "total_amount = subtotal + tax + shipping"
+      tolerance: 0.01
+      error_message: "Total amount calculation mismatch"
+    severity: "warning"
+    enabled: true
+    description: "Validate calculated fields match sum of components"
+
+# =======================
+# DATA QUALITY RULES
+# =======================
+
+data_quality_rules:
+  - rule_name: "no_null_critical_fields"
+    rule_type: "required_field"
+    field_name: ["id", "created_at", "source_system"]
+    severity: "error"
+    enabled: true
+    description: "Critical fields must never be null"
+
+  - rule_name: "string_length_check"
+    rule_type: "custom"
+    field_name: "description"
+    parameters:
+      expression: "LENGTH(value) <= 1000"
+      error_message: "Description exceeds maximum length of 1000 characters"
+    severity: "warning"
+    enabled: true
+    description: "Enforce maximum string lengths"
+
+  - rule_name: "no_leading_trailing_spaces"
+    rule_type: "custom"
+    field_name: "name"
+    parameters:
+      expression: "TRIM(value) = value"
+      error_message: "Field contains leading or trailing spaces"
+    severity: "warning"
+    enabled: false
+    description: "Detect untrimmed strings (disabled by default)"
+
+  - rule_name: "unique_identifier"
+    rule_type: "custom"
+    field_name: "record_id"
+    parameters:
+      expression: "IS_UNIQUE(value)"
+      error_message: "Duplicate record ID detected"
+    severity: "error"
+    enabled: true
+    description: "Ensure record IDs are unique within batch"
+
+# =======================
+# NOTES
+# =======================
+
+# Rule Types:
+# - required_field: Field must be present and non-null
+# - type_check: Field must match expected data type
+# - range: Numeric field must fall within min/max bounds
+# - regex: String field must match regular expression pattern
+# - custom: Custom validation logic (SQL-like expressions)
+
+# Severity Levels:
+# - error: Record fails validation and goes to quarantine
+# - warning: Record passes with warning (logged but not quarantined)
+
+# enabled: Set to false to temporarily disable a rule without deletion
+
+# Tips:
+# 1. Start with required_field and type_check rules
+# 2. Add range checks for numeric fields
+# 3. Use regex for format validation (emails, IDs, codes)
+# 4. Leverage custom rules for complex business logic
+# 5. Use warning severity for soft validations
+# 6. Test rules on sample data before production deployment
+# 7. Monitor quarantine rates to adjust rule strictness
+# 8. Document business rationale for each rule

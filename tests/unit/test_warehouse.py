@@ -2,12 +2,12 @@
 Unit tests for warehouse operations (schema management and upsert).
 """
 
-import pytest
-from datetime import datetime
 
-from src.core.models import WarehouseData, QuarantineRecord
+import pytest
+
+from src.core.models import QuarantineRecord, WarehouseData
 from src.warehouse.schema_mgmt import SchemaManager
-from src.warehouse.upsert import WarehouseWriter, QuarantineWriter
+from src.warehouse.upsert import QuarantineWriter, WarehouseWriter
 
 
 @pytest.mark.integration

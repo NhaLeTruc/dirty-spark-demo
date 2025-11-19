@@ -2,9 +2,10 @@
 ValidationRule model representing a configurable constraint applied to incoming data.
 """
 
-from pydantic import BaseModel, Field
-from typing import Literal, Dict, Any
 from datetime import datetime
+from typing import Any, Literal
+
+from pydantic import BaseModel, Field
 
 
 class ValidationRule(BaseModel):
@@ -26,7 +27,7 @@ class ValidationRule(BaseModel):
     rule_name: str = Field(..., min_length=1)
     rule_type: Literal["required_field", "type_check", "range", "regex", "custom"]
     field_name: str
-    parameters: Dict[str, Any] | None = None
+    parameters: dict[str, Any] | None = None
     enabled: bool = True
     severity: Literal["error", "warning"] = "error"
     created_at: datetime = Field(default_factory=datetime.utcnow)

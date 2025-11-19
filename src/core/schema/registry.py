@@ -4,7 +4,7 @@ Schema registry for managing schema versions.
 Saves and loads schemas from the schema_version table in PostgreSQL.
 """
 
-from typing import Any, Dict, Optional, Tuple
+from typing import Any
 
 from pyspark.sql.types import StructType
 
@@ -37,9 +37,9 @@ class SchemaRegistry:
     def get_or_infer_schema(
         self,
         source_id: str,
-        sample_data_path: Optional[str] = None,
-        sample_df: Optional[Any] = None
-    ) -> Tuple[StructType, int, float]:
+        sample_data_path: str | None = None,
+        sample_df: Any | None = None
+    ) -> tuple[StructType, int, float]:
         """
         Get existing schema or infer new one.
 
@@ -91,7 +91,7 @@ class SchemaRegistry:
         source_id: str,
         schema: StructType,
         inferred: bool = True,
-        confidence: Optional[float] = None
+        confidence: float | None = None
     ) -> int:
         """
         Save schema to registry.
@@ -118,7 +118,7 @@ class SchemaRegistry:
 
         return schema_id
 
-    def get_schema(self, source_id: str, version: Optional[int] = None) -> Optional[StructType]:
+    def get_schema(self, source_id: str, version: int | None = None) -> StructType | None:
         """
         Get schema by source and version.
 

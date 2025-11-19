@@ -2,18 +2,17 @@
 
 import pytest
 from pyspark.sql.types import (
-    StructType,
-    StructField,
-    StringType,
+    DoubleType,
     IntegerType,
     LongType,
-    DoubleType,
-    BooleanType,
+    StringType,
+    StructField,
+    StructType,
 )
 
 from src.core.schema.evolution import (
-    SchemaEvolutionManager,
     SchemaEvolutionError,
+    SchemaEvolutionManager,
     merge_streaming_schemas,
 )
 

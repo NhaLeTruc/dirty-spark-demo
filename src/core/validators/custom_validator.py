@@ -2,7 +2,8 @@
 CustomValidator - validates using a custom Python function.
 """
 
-from typing import Any, Dict, Callable
+from typing import Any
+
 from .base_validator import BaseValidator, ValidationError
 
 
@@ -21,7 +22,7 @@ class CustomValidator(BaseValidator):
                 raise ValueError("Validation failed")
     """
 
-    def __init__(self, field_name: str, parameters: Dict[str, Any] | None = None):
+    def __init__(self, field_name: str, parameters: dict[str, Any] | None = None):
         super().__init__(field_name, parameters)
 
         # Get validator function
@@ -35,7 +36,7 @@ class CustomValidator(BaseValidator):
         # Optional custom error message
         self.error_message = self.parameters.get("error_message", "Custom validation failed")
 
-    def validate(self, value: Any, record: Dict[str, Any]) -> None:
+    def validate(self, value: Any, record: dict[str, Any]) -> None:
         """
         Validate using the custom function.
 

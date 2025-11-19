@@ -5,7 +5,6 @@ Consumes messages from Apache Kafka topics using Spark Structured Streaming.
 """
 
 import logging
-from typing import Optional, List
 
 from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql.functions import col, from_json
@@ -28,7 +27,7 @@ class KafkaSource:
         self,
         spark: SparkSession,
         data_source: DataSource,
-        value_schema: Optional[StructType] = None,
+        value_schema: StructType | None = None,
     ):
         """
         Initialize Kafka stream source.
@@ -193,9 +192,9 @@ def create_kafka_source(
     bootstrap_servers: str,
     topic: str,
     source_id: str,
-    value_schema: Optional[StructType] = None,
+    value_schema: StructType | None = None,
     starting_offsets: str = "latest",
-    group_id: Optional[str] = None,
+    group_id: str | None = None,
 ) -> KafkaSource:
     """
     Factory function to create KafkaSource with minimal configuration.

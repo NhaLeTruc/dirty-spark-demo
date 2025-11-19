@@ -4,11 +4,12 @@ Unit tests for database connection pool
 Tests the PostgreSQL connection pool functionality using testcontainers.
 """
 import pytest
+
 from src.warehouse.connection import (
     DatabaseConnectionPool,
-    initialize_pool,
-    get_pool,
     close_pool,
+    get_pool,
+    initialize_pool,
 )
 
 
