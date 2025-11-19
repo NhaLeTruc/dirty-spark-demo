@@ -54,7 +54,8 @@ def test_infer_from_dataframe(spark):
     ]
     df = spark.createDataFrame(data, ["transaction_id", "amount", "email"])
 
-    schema, confidence = inferrer.infer_from_dataframe(df)
+    # Use sample_fraction=1.0 for small test dataset to ensure all rows are sampled
+    schema, confidence = inferrer.infer_from_dataframe(df, sample_fraction=1.0)
 
     assert schema is not None
     assert len(schema.fields) == 3

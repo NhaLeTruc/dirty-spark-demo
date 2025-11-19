@@ -1,4 +1,4 @@
-FROM bitnami/spark:3.5.1
+FROM bitnamilegacy/spark:3.5.1-debian-12-r9
 
 # Switch to root to install additional packages
 USER root

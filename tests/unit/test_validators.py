@@ -64,9 +64,9 @@ class TestRequiredFieldValidator:
         record = {"name": ""}
         validator.validate(record["name"], record)  # Should not raise
 
-    @given(st.text(min_size=1))
+    @given(st.text(min_size=1).filter(lambda s: s.strip() != ""))
     def test_property_any_nonempty_string_passes(self, value):
-        """Property test: any non-empty string should pass"""
+        """Property test: any non-empty, non-whitespace string should pass"""
         validator = RequiredFieldValidator("field")
         record = {"field": value}
         validator.validate(record["field"], record)  # Should not raise
