@@ -298,6 +298,8 @@ def start_metrics_server(port: Optional[int] = None) -> None:
     Args:
         port: Port to listen on (defaults to env var METRICS_PORT or 8000)
     """
+    # Lazy import: Prometheus HTTP server only needed when metrics endpoint is enabled
+    # Avoids port binding on import and allows using metrics without HTTP server
     from prometheus_client import start_http_server
 
     metrics_port = port or int(os.getenv("METRICS_PORT", "8000"))

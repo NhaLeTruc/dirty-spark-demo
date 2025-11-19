@@ -82,8 +82,10 @@ class WarehouseSink:
                 })
 
             # Write to database
-            conn = get_connection()
+            conn = None
+            cursor = None
             try:
+                conn = get_connection()
                 cursor = conn.cursor()
 
                 for record in warehouse_records:
@@ -113,12 +115,25 @@ class WarehouseSink:
                 )
 
             except Exception as e:
-                conn.rollback()
+                if conn:
+                    try:
+                        conn.rollback()
+                    except Exception as rollback_error:
+                        logger.warning(f"Rollback failed: {rollback_error}")
                 logger.error(f"Database error in batch {batch_id}: {e}", exc_info=True)
                 raise
             finally:
-                cursor.close()
-                conn.close()
+                # Safe cleanup - check for None before closing
+                if cursor:
+                    try:
+                        cursor.close()
+                    except Exception as e:
+                        logger.warning(f"Error closing cursor: {e}")
+                if conn:
+                    try:
+                        conn.close()
+                    except Exception as e:
+                        logger.warning(f"Error closing connection: {e}")
 
         except Exception as e:
             logger.error(f"Failed to write batch {batch_id}: {e}", exc_info=True)

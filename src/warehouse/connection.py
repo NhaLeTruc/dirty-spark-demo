@@ -48,7 +48,15 @@ class DatabaseConnectionPool:
         self.port = port or int(os.getenv("DB_PORT", "5432"))
         self.database = database or os.getenv("DB_NAME", "datawarehouse")
         self.user = user or os.getenv("DB_USER", "pipeline")
-        self.password = password or os.getenv("DB_PASSWORD", "dev_password")
+        self.password = password or os.getenv("DB_PASSWORD")
+
+        # Security: Require password to be explicitly set
+        if not self.password:
+            raise ValueError(
+                "Database password must be provided. "
+                "Set DB_PASSWORD environment variable or pass to constructor."
+            )
+
         self.min_size = min_size
         self.max_size = max_size
         self.timeout = timeout

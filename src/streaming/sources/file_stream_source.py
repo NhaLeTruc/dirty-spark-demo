@@ -104,9 +104,10 @@ class FileStreamSource:
         stream_df = stream_reader.load(self.stream_path)
 
         # Add source metadata
+        from pyspark.sql.functions import lit
         stream_df = stream_df.withColumn(
             "source_id",
-            self.spark.sql(f"SELECT '{self.data_source.source_id}'").first()[0]
+            lit(self.data_source.source_id)
         )
 
         logger.info(
