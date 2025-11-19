@@ -96,6 +96,7 @@ A compliance officer needs to trace a specific customer record from its original
 
 - **FR-001**: System MUST validate all incoming data against configurable rules before warehouse insertion
 - **FR-002**: System MUST quarantine invalid data with complete error context (source ID, failed rule, timestamp, sample data) rather than dropping it
+- **FR-002a**: System MUST support warning-level validation rules that flag data quality issues without blocking record ingestion
 - **FR-003**: System MUST support both batch processing mode (for historical datasets) and streaming mode (for real-time ingestion) using identical validation logic
 - **FR-004**: System MUST preserve original raw data alongside cleaned/transformed data for audit purposes
 - **FR-005**: System MUST track data lineage from source through transformations to destination
@@ -114,6 +115,8 @@ A compliance officer needs to trace a specific customer record from its original
 - **FR-018**: System MUST prevent partial writes - transactions either complete fully or roll back
 - **FR-019**: System MUST process batch data in configurable chunk sizes to maintain constant memory usage
 - **FR-020**: System MUST flag records that are impossible to normalize (violate fundamental business rules) for manual review
+- **FR-021**: System MUST prevent SQL injection and path traversal attacks through input validation
+- **FR-022**: System MUST use context managers for database connections to ensure proper resource cleanup
 
 ### Key Entities
 
@@ -121,7 +124,7 @@ A compliance officer needs to trace a specific customer record from its original
 - **ValidationRule**: A configurable constraint applied to incoming data. Attributes: rule_id, rule_type (required_field, type_check, range, regex, custom), parameters, enabled_status
 - **DataRecord**: A single unit of data being processed. Attributes: record_id, source_id, raw_payload, processed_payload, validation_status, processing_timestamp
 - **QuarantineRecord**: An invalid record with error context. Attributes: quarantine_id, record_id, failed_rules, error_messages, quarantine_timestamp, reviewed_status
-- **ValidationResult**: The outcome of validating a record. Attributes: record_id, passed_rules, failed_rules, transformation_applied, confidence_score
+- **ValidationResult**: The outcome of validating a record. Attributes: record_id, passed_rules, failed_rules, warnings (non-blocking issues), transformation_applied, confidence_score
 - **SchemaVersion**: A snapshot of the data schema at a point in time. Attributes: version_id, fields, types, constraints, created_timestamp
 - **AuditLog**: A lineage entry tracking data transformations. Attributes: log_id, record_id, transformation_type, old_value, new_value, rule_applied, timestamp
 

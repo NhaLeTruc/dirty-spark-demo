@@ -88,6 +88,7 @@ class RuleEngine:
         """
         passed_rules = []
         failed_rules = []
+        warnings = []
         transformations = []
 
         # Use processed_payload if available, otherwise raw_payload
@@ -110,8 +111,7 @@ class RuleEngine:
                     failed_rules.append(rule_name)
                 else:
                     # Warning: log but don't fail the record
-                    passed_rules.append(rule_name)
-                    # TODO: Add to warning list when implemented
+                    warnings.append(rule_name)
 
         # Determine overall pass/fail
         passed = len(failed_rules) == 0
@@ -121,6 +121,7 @@ class RuleEngine:
             passed=passed,
             passed_rules=passed_rules,
             failed_rules=failed_rules,
+            warnings=warnings,
             transformations_applied=transformations,
         )
 

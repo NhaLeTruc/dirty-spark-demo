@@ -18,6 +18,7 @@ class ValidationResult(BaseModel):
         passed: Overall validation status
         passed_rules: Rules that succeeded
         failed_rules: Rules that failed
+        warnings: Non-blocking validation warnings (issues that don't fail the record)
         transformations_applied: List of transformations (e.g., "date_format_normalized")
         confidence_score: Schema inference confidence (0.0-1.0)
     """
@@ -26,6 +27,7 @@ class ValidationResult(BaseModel):
     passed: bool
     passed_rules: List[str] = Field(default_factory=list)
     failed_rules: List[str] = Field(default_factory=list)
+    warnings: List[str] = Field(default_factory=list)
     transformations_applied: List[str] = Field(default_factory=list)
     confidence_score: float | None = Field(None, ge=0.0, le=1.0)
 
@@ -48,6 +50,10 @@ class ValidationResult(BaseModel):
                     "amount_range"
                 ],
                 "failed_rules": [],
+                "warnings": [
+                    "unusual_amount_for_category",
+                    "timestamp_in_future"
+                ],
                 "transformations_applied": [
                     "amount_str_to_float",
                     "date_iso_format"

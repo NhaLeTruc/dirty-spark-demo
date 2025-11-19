@@ -4,6 +4,13 @@
 **Purpose**: Get the validation pipeline running locally in under 15 minutes
 **Prerequisites**: Docker, Python 3.11+, 8GB RAM minimum
 
+**Latest Updates**:
+- ✅ Warning-level validation support (non-blocking data quality checks)
+- ✅ Enhanced security with input validation utilities
+- ✅ Improved resource management with database context managers
+- ✅ Complete data lineage tracking via admin CLI
+- 📚 See [docs/IMPROVEMENTS_COMPLETED.md](../../docs/IMPROVEMENTS_COMPLETED.md) for all enhancements
+
 ---
 
 ## Table of Contents
@@ -357,6 +364,23 @@ EOF
 ```
 
 ### 3. View Data Lineage (Audit Trail)
+
+**Option 1: Using Admin CLI (Recommended)**
+
+```bash
+# Trace a specific record's complete lineage
+python -m src.cli.admin_cli trace-record \
+  --record-id TXN0000000001 \
+  --limit 100
+
+# Generate an audit report for a source
+python -m src.cli.admin_cli audit-report \
+  --source sample_transactions \
+  --detailed \
+  --limit 100
+```
+
+**Option 2: Direct SQL Query**
 
 ```bash
 # Trace a specific record's transformations

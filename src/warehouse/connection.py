@@ -233,3 +233,49 @@ def close_pool() -> None:
     if _global_pool is not None:
         _global_pool.close()
         _global_pool = None
+
+
+@contextmanager
+def get_connection_context():
+    """
+    Context manager for getting a database connection from the global pool.
+
+    This is a convenience function that works with the global pool.
+
+    Usage:
+        with get_connection_context() as conn:
+            # Use connection
+            pass
+
+    Yields:
+        psycopg.Connection: Database connection from the global pool
+
+    Raises:
+        RuntimeError: If global pool is not initialized
+    """
+    pool = get_pool()
+    with pool.get_connection() as conn:
+        yield conn
+
+
+@contextmanager
+def get_cursor_context():
+    """
+    Context manager for getting a database cursor from the global pool.
+
+    This is a convenience function that works with the global pool.
+
+    Usage:
+        with get_cursor_context() as cursor:
+            cursor.execute("SELECT * FROM table")
+            results = cursor.fetchall()
+
+    Yields:
+        psycopg.Cursor: Database cursor from the global pool
+
+    Raises:
+        RuntimeError: If global pool is not initialized
+    """
+    pool = get_pool()
+    with pool.get_cursor() as cur:
+        yield cur

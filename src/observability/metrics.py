@@ -70,6 +70,14 @@ validation_failures_total = Counter(
     registry=REGISTRY,
 )
 
+# Validation warnings counter
+validation_warnings_total = Counter(
+    name="pipeline_validation_warnings_total",
+    documentation="Total number of validation warnings (non-blocking issues)",
+    labelnames=["source_id", "rule_name"],
+    registry=REGISTRY,
+)
+
 # Quarantine size gauge
 quarantine_size = Gauge(
     name="pipeline_quarantine_size",

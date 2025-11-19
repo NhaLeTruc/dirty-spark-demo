@@ -9,6 +9,10 @@ from pyspark.sql import SparkSession, DataFrame
 from pyspark.sql.types import StructType, StructField, StringType, DoubleType, IntegerType, TimestampType, BooleanType
 import re
 
+from src.observability.logger import get_logger
+
+logger = get_logger(__name__)
+
 
 class SchemaInferrer:
     """
@@ -128,12 +132,19 @@ class SchemaInferrer:
                 confidence_scores.append(null_score)
 
             # Overall confidence is average of all scores
-            overall_confidence = sum(confidence_scores) / len(confidence_scores) if confidence_scores else 0.0
+            if not confidence_scores:
+                return 0.0
+            overall_confidence = sum(confidence_scores) / len(confidence_scores)
 
             return round(overall_confidence, 2)
 
-        except Exception:
-            # If confidence calculation fails, return moderate confidence
+        except (TypeError, ValueError) as e:
+            # Handle type/value errors in calculation
+            logger.debug(f"Confidence calculation failed: {e}. Using default confidence.", exc_info=True)
+            return 0.7
+        except Exception as e:
+            # Catch unexpected errors (e.g., Spark errors during sampling)
+            logger.warning(f"Unexpected error in confidence calculation: {e}", exc_info=True)
             return 0.7
 
     def _score_field_name(self, field_name: str) -> float:
