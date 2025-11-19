@@ -30,7 +30,7 @@ git clone <repository-url>
 cd dirty-spark-demo
 
 # Create virtual environment
-python3.11 -m venv venv
+python3 -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 
 # Install dependencies
@@ -41,22 +41,22 @@ pip install -r requirements.txt
 
 ```bash
 # Start PostgreSQL, Spark, and Kafka
-docker-compose -f docker/docker-compose.yml up -d
+docker compose -f docker/docker-compose.yml up -d
 
 # Verify all services are running
-docker-compose -f docker/docker-compose.yml ps
+docker compose -f docker/docker-compose.yml ps
 ```
 
 ### 3. Run Sample Batch Processing
 
 ```bash
 # Process a dirty CSV file
-python -m src.cli.batch_cli process \
+python3 -m src.cli.batch_cli process \
   --source sample_transactions \
   --input tests/fixtures/dirty_data.csv
 
 # View quarantined records
-python -m src.cli.admin_cli quarantine-review --limit 10
+python3 -m src.cli.admin_cli quarantine-review --limit 10
 ```
 
 ### 4. Run Tests
@@ -196,7 +196,7 @@ See `config/local.env` for all configuration options:
 
 ```bash
 # Process a batch file
-python -m src.cli.batch_cli process \
+python3 -m src.cli.batch_cli process \
   --source <source_id> \
   --input <file_path> \
   [--validation-rules <rules_file>] \
@@ -207,31 +207,31 @@ python -m src.cli.batch_cli process \
 
 ```bash
 # Start streaming pipeline
-python -m src.cli.stream_cli start \
+python3 -m src.cli.stream_cli start \
   --source <source_id> \
   --stream-source [kafka|file_stream] \
   --checkpoint-location <checkpoint_dir>
 
 # Stop streaming
-python -m src.cli.stream_cli stop --query-id <query_id>
+python3 -m src.cli.stream_cli stop --query-id <query_id>
 ```
 
 ### Administration
 
 ```bash
 # Trace record lineage
-python -m src.cli.admin_cli trace-record \
+python3 -m src.cli.admin_cli trace-record \
   --record-id <record_id> \
   [--limit <count>]
 
 # Generate audit report
-python -m src.cli.admin_cli audit-report \
+python3 -m src.cli.admin_cli audit-report \
   [--source <source_id>] \
   [--detailed] \
   [--limit <count>]
 
 # Review quarantined records (Phase 6 feature - coming soon)
-python -m src.cli.admin_cli quarantine-review \
+python3 -m src.cli.admin_cli quarantine-review \
   [--source <source_id>] \
   [--limit <count>]
 ```
@@ -271,8 +271,7 @@ mypy src/
 
 ```bash
 # Build Spark image
-cd docker
-docker build -t dirty-spark:3.5.1 -f Dockerfile.spark .
+docker build -t dirty-spark:3.5.1 -f docker/Dockerfile.spark .
 ```
 
 ## Monitoring
@@ -298,7 +297,7 @@ docker build -t dirty-spark:3.5.1 -f Dockerfile.spark .
 
 ```bash
 # Check if container is running
-docker-compose -f docker/docker-compose.yml ps postgres
+docker compose -f docker/docker-compose.yml ps postgres
 
 # Test connection
 psql -h localhost -U pipeline -d datawarehouse -c "SELECT 1;"
@@ -312,7 +311,7 @@ psql -h localhost -U pipeline -d datawarehouse -c "SELECT 1;"
 docker logs dirty-spark-master
 
 # Restart Spark cluster
-docker-compose -f docker/docker-compose.yml restart spark-master spark-worker
+docker compose -f docker/docker-compose.yml restart spark-master spark-worker
 ```
 
 ### Tests Failing

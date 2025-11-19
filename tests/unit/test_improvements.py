@@ -223,7 +223,8 @@ class TestValidationWarningsMetric:
 
     def test_metric_name(self):
         """Test metric has correct name."""
-        assert validation_warnings_total._name == "pipeline_validation_warnings_total"
+        # Prometheus Counter automatically adds _total suffix, so the internal name doesn't include it
+        assert validation_warnings_total._name == "pipeline_validation_warnings"
 
     def test_metric_labels(self):
         """Test metric has correct labels."""
