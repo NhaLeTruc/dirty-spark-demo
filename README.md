@@ -6,10 +6,13 @@ A robust data validation and transformation pipeline that ingests messy, real-wo
 
 - ✅ **Dual-Mode Processing**: Unified validation logic for both batch (Apache Spark) and streaming (Spark Structured Streaming)
 - ✅ **Data Quality First**: Validates all data before warehouse insertion, quarantines invalid records with full error context
+- ✅ **Warning-Level Validation**: Non-blocking validation warnings for data quality monitoring without failing records
 - ✅ **Schema Flexibility**: Handles schema-less, un-tabulated, and evolving data structures without breaking
 - ✅ **Idempotent & Reliable**: Upsert-based warehouse writes, exactly-once semantics, checkpoint-based recovery
 - ✅ **Full Observability**: Structured JSON logging, Prometheus metrics, complete data lineage tracking
 - ✅ **Type Safety**: Pydantic models with runtime validation, explicit type coercion rules
+- ✅ **Input Validation**: Comprehensive validation utilities preventing SQL injection and path traversal attacks
+- ✅ **Resource Safety**: Context managers for automatic database connection cleanup
 - ✅ **Test-Driven**: Comprehensive unit, integration, and E2E tests with >80% coverage
 
 ## Quick Start
@@ -87,6 +90,7 @@ dirty-spark-demo/
 │   │   └── pipeline.py    # Streaming orchestration
 │   ├── warehouse/         # PostgreSQL interactions
 │   ├── observability/     # Logging, metrics, lineage
+│   ├── utils/             # Validation utilities, helpers
 │   └── cli/               # Command-line interfaces
 ├── tests/
 │   ├── unit/              # Unit tests
@@ -97,6 +101,10 @@ dirty-spark-demo/
 │   ├── docker-compose.yml
 │   ├── Dockerfile.spark
 │   └── init-db.sql
+├── docs/                  # Documentation
+│   ├── CODE_REVIEW_FINDINGS.md
+│   ├── IMPROVEMENTS_COMPLETED.md
+│   └── LINTING_AND_PRECOMMIT_PLAN.md
 └── config/                # Configuration files
     ├── validation_rules.yaml
     ├── local.env
@@ -117,11 +125,13 @@ CSV/Kafka → Spark Batch/Streaming → Validation Engine → [Valid] → Postgr
 
 ### Key Components
 
-- **Validation Engine**: Pluggable rule system (required field, type check, range, regex, custom)
+- **Validation Engine**: Pluggable rule system (required field, type check, range, regex, custom) with warning-level support
 - **Schema Registry**: Tracks schema versions with confidence scoring
-- **Warehouse Writer**: Idempotent upserts using `INSERT ... ON CONFLICT`
+- **Warehouse Writer**: Idempotent upserts using `INSERT ... ON CONFLICT` with safe resource management
 - **Quarantine System**: Stores invalid records with detailed error messages for review
 - **Audit Log**: Partitioned table tracking all transformations for compliance
+- **Input Validation**: Security-focused utilities for SQL injection and path traversal prevention
+- **Connection Pool**: Context-managed database connections with automatic cleanup
 
 ## Configuration
 
@@ -132,20 +142,43 @@ Edit `config/validation_rules.yaml`:
 ```yaml
 rules:
   transaction_id:
-    - type: required
-    - type: regex
-      params:
+    - rule_name: require_transaction_id
+      rule_type: required_field
+      field_name: transaction_id
+      severity: error  # or "warning" for non-blocking
+      enabled: true
+    - rule_name: transaction_id_regex
+      rule_type: regex
+      field_name: transaction_id
+      severity: error
+      parameters:
         pattern: "^TXN[0-9]{10}$"
 
   amount:
-    - type: required
-    - type: type_check
-      params:
+    - rule_name: require_amount
+      rule_type: required_field
+      field_name: amount
+      severity: error
+    - rule_name: amount_type_check
+      rule_type: type_check
+      field_name: amount
+      severity: error
+      parameters:
         expected_type: float
-    - type: range
-      params:
+    - rule_name: amount_range
+      rule_type: range
+      field_name: amount
+      severity: error
+      parameters:
         min: 0.01
         max: 1000000.00
+    - rule_name: unusual_amount_check
+      rule_type: range
+      field_name: amount
+      severity: warning  # Non-blocking warning
+      parameters:
+        min: 0.01
+        max: 50000.00
 ```
 
 ### Environment Variables
@@ -186,19 +219,21 @@ python -m src.cli.stream_cli stop --query-id <query_id>
 ### Administration
 
 ```bash
-# Review quarantined records
+# Trace record lineage
+python -m src.cli.admin_cli trace-record \
+  --record-id <record_id> \
+  [--limit <count>]
+
+# Generate audit report
+python -m src.cli.admin_cli audit-report \
+  [--source <source_id>] \
+  [--detailed] \
+  [--limit <count>]
+
+# Review quarantined records (Phase 6 feature - coming soon)
 python -m src.cli.admin_cli quarantine-review \
   [--source <source_id>] \
   [--limit <count>]
-
-# Reprocess quarantine after fixing rules
-python -m src.cli.admin_cli reprocess \
-  --source <source_id> \
-  [--quarantine-ids <id1,id2,id3>]
-
-# Trace record lineage
-python -m src.cli.admin_cli trace-record \
-  --record-id <record_id>
 ```
 
 ## Development
@@ -251,9 +286,11 @@ docker build -t dirty-spark:3.5.1 -f Dockerfile.spark .
 ### Metrics Exposed
 
 - `pipeline_records_processed_total{source_id, status}`: Total records processed
-- `pipeline_processing_seconds`: Record processing latency histogram
-- `pipeline_quarantine_records`: Current quarantine size
-- `pipeline_validation_failures_total{source_id, rule_type}`: Validation failures by rule
+- `pipeline_processing_duration_seconds{source_id, mode}`: Record processing latency histogram
+- `pipeline_quarantine_size{source_id}`: Current quarantine size
+- `pipeline_validation_failures_total{source_id, rule_type, field_name}`: Validation failures by rule
+- `pipeline_validation_warnings_total{source_id, rule_name}`: Non-blocking validation warnings
+- `pipeline_streaming_latency_seconds{source_id}`: End-to-end streaming latency
 
 ## Troubleshooting
 
@@ -293,11 +330,21 @@ pytest tests/ -vv --tb=short
 
 ## Documentation
 
+### Specifications
 - **Specification**: `specs/001-dirty-data-validation/spec.md`
 - **Implementation Plan**: `specs/001-dirty-data-validation/plan.md`
 - **Tasks Breakdown**: `specs/001-dirty-data-validation/tasks.md`
 - **Data Model**: `specs/001-dirty-data-validation/data-model.md`
 - **Quickstart Guide**: `specs/001-dirty-data-validation/quickstart.md`
+
+### Code Quality & Improvements
+- **Code Review Findings**: `docs/CODE_REVIEW_FINDINGS.md` - Comprehensive code analysis
+- **Improvements Completed**: `docs/IMPROVEMENTS_COMPLETED.md` - All implemented enhancements
+- **Linting & Pre-commit Plan**: `docs/LINTING_AND_PRECOMMIT_PLAN.md` - Code quality automation
+
+### API Documentation
+- **Input Validation**: See `src/utils/validation.py` for security-focused validation functions
+- **Connection Management**: See `src/warehouse/connection.py` for context managers
 
 ## Contributing
 

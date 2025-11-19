@@ -309,6 +309,7 @@ class QuarantineRecord(BaseModel):
 | passed | BOOLEAN | Yes | Overall validation status |
 | passed_rules | TEXT[] | Yes | Rules that succeeded |
 | failed_rules | TEXT[] | Yes | Rules that failed |
+| warnings | TEXT[] | No | Non-blocking validation warnings (data quality issues that don't fail the record) |
 | transformations_applied | TEXT[] | No | List of transformations (e.g., "date_format_normalized") |
 | confidence_score | FLOAT | No | Schema inference confidence (0.0-1.0) |
 
@@ -331,6 +332,7 @@ class ValidationResult(BaseModel):
     passed: bool
     passed_rules: List[str] = Field(default_factory=list)
     failed_rules: List[str] = Field(default_factory=list)
+    warnings: List[str] = Field(default_factory=list)  # NEW: Non-blocking warnings
     transformations_applied: List[str] = Field(default_factory=list)
     confidence_score: float | None = Field(None, ge=0.0, le=1.0)
 
