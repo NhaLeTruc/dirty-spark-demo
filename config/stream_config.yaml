@@ -1,0 +1,189 @@
+# Streaming Pipeline Configuration
+# Configuration for Spark Structured Streaming data validation pipelines
+
+# Spark Streaming Configuration
+spark:
+  # Trigger interval for micro-batches
+  trigger_interval: "10 seconds"
+
+  # Checkpoint configuration
+  checkpoint:
+    # Base directory for checkpoints (for exactly-once semantics)
+    location: "/tmp/checkpoints/dirty-spark-streaming"
+
+    # State store provider (RocksDB for production)
+    state_store_provider: "org.apache.spark.sql.execution.streaming.state.RocksDBStateStoreProvider"
+
+  # Shuffle partitions for streaming operations
+  shuffle_partitions: 4
+
+  # Maximum files per trigger (for file streams)
+  max_files_per_trigger: 10
+
+  # Processing time per trigger (timeout)
+  processing_timeout_seconds: 300
+
+# File Stream Configuration
+file_stream:
+  # Default directory for file streams
+  default_path: "/tmp/stream_input"
+
+  # File format (json, csv, parquet)
+  file_format: "json"
+
+  # Whether to process files in order (latestFirst=false)
+  process_in_order: true
+
+  # Clean up processed files
+  cleanup_processed: false
+
+# Kafka Stream Configuration
+kafka:
+  # Default Kafka bootstrap servers
+  bootstrap_servers: "localhost:9092"
+
+  # Consumer group ID prefix
+  consumer_group_prefix: "dirty-spark-pipeline"
+
+  # Starting offsets (earliest, latest, or specific)
+  starting_offsets: "latest"
+
+  # Maximum offsets per trigger
+  max_offsets_per_trigger: 10000
+
+  # Kafka-specific options
+  options:
+    # Fail on data loss (false for development)
+    fail_on_data_loss: false
+
+    # Session timeout
+    session_timeout_ms: 30000
+
+    # Request timeout
+    request_timeout_ms: 40000
+
+# Validation Configuration
+validation:
+  # Path to validation rules
+  rules_file: "config/validation_rules.yaml"
+
+  # Validation timeout per record (seconds)
+  timeout_seconds: 5
+
+  # Whether to allow partial validation (continue on error)
+  allow_partial: false
+
+# Sink Configuration
+sinks:
+  warehouse:
+    # Batch size for warehouse writes
+    batch_size: 1000
+
+    # Write timeout (seconds)
+    timeout_seconds: 60
+
+    # Retry configuration
+    max_retries: 3
+    retry_delay_seconds: 5
+
+  quarantine:
+    # Batch size for quarantine writes
+    batch_size: 500
+
+    # Write timeout (seconds)
+    timeout_seconds: 30
+
+# Metrics Configuration
+metrics:
+  # Enable metrics collection
+  enabled: true
+
+  # Metrics port (Prometheus endpoint)
+  port: 8000
+
+  # Metrics update interval
+  update_interval_seconds: 10
+
+  # Export streaming-specific metrics
+  streaming_metrics:
+    - latency
+    - throughput
+    - batch_size
+    - backpressure
+
+# Logging Configuration
+logging:
+  # Log level (DEBUG, INFO, WARNING, ERROR)
+  level: "INFO"
+
+  # Log format (json, text)
+  format: "json"
+
+  # Log stream events
+  log_stream_events: true
+
+  # Log batch progress
+  log_batch_progress: true
+
+# Error Handling
+error_handling:
+  # Continue streaming on validation errors
+  continue_on_validation_error: true
+
+  # Continue on sink write errors (will retry)
+  continue_on_sink_error: false
+
+  # Maximum consecutive failures before stopping
+  max_consecutive_failures: 10
+
+# Performance Tuning
+performance:
+  # Enable adaptive query execution
+  adaptive_execution: true
+
+  # Coalesce output partitions
+  coalesce_partitions: true
+  num_output_partitions: 2
+
+  # Memory configuration
+  executor_memory: "2g"
+  driver_memory: "1g"
+
+  # Backpressure configuration
+  backpressure:
+    enabled: true
+    initial_rate: 1000  # Initial records per second
+
+# Schema Evolution
+schema_evolution:
+  # Enable schema evolution
+  enabled: true
+
+  # Allow new fields
+  allow_new_fields: true
+
+  # Allow compatible type changes
+  allow_compatible_type_changes: true
+
+  # Reject incompatible changes
+  reject_incompatible_changes: true
+
+# Data Sources
+# Example source configurations
+sources:
+  example_file_stream:
+    type: "file_stream"
+    enabled: false
+    config:
+      stream_path: "/data/stream_input"
+      file_format: "json"
+      schema_file: "config/schemas/example_schema.json"
+
+  example_kafka_stream:
+    type: "kafka"
+    enabled: false
+    config:
+      bootstrap_servers: "localhost:9092"
+      topic: "transactions"
+      consumer_group: "dirty-spark-pipeline-transactions"
+      starting_offsets: "latest"

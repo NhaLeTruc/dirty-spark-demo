@@ -78,6 +78,52 @@ quarantine_size = Gauge(
     registry=REGISTRY,
 )
 
+# =======================
+# STREAMING METRICS (T086)
+# =======================
+
+# Streaming latency histogram
+streaming_latency_seconds = Histogram(
+    name="pipeline_streaming_latency_seconds",
+    documentation="End-to-end latency for streaming records (source to sink)",
+    labelnames=["source_id"],
+    buckets=[0.1, 0.5, 1.0, 2.0, 5.0, 10.0, 30.0],
+    registry=REGISTRY,
+)
+
+# Streaming batch size
+streaming_batch_size = Histogram(
+    name="pipeline_streaming_batch_size",
+    documentation="Number of records per streaming micro-batch",
+    labelnames=["source_id"],
+    buckets=[1, 10, 50, 100, 500, 1000, 5000, 10000],
+    registry=REGISTRY,
+)
+
+# Streaming backpressure indicator
+streaming_backpressure = Gauge(
+    name="pipeline_streaming_backpressure",
+    documentation="Backpressure detected (1) or not (0)",
+    labelnames=["source_id"],
+    registry=REGISTRY,
+)
+
+# Input rate (records/sec from source)
+streaming_input_rate = Gauge(
+    name="pipeline_streaming_input_rate",
+    documentation="Input rate in records per second",
+    labelnames=["source_id"],
+    registry=REGISTRY,
+)
+
+# Processing rate (records/sec processed)
+streaming_processing_rate = Gauge(
+    name="pipeline_streaming_processing_rate",
+    documentation="Processing rate in records per second",
+    labelnames=["source_id"],
+    registry=REGISTRY,
+)
+
 # Schema evolution events
 schema_evolution_total = Counter(
     name="pipeline_schema_evolution_total",

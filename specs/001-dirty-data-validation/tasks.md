@@ -151,30 +151,30 @@
 
 ### Tests for User Story 2 ⚠️
 
-- [ ] T072 [P] [US2] Create tests/fixtures/malformed_events.json with valid and invalid JSON events
-- [ ] T073 [P] [US2] Create tests/e2e/test_streaming_flow.py with file stream test (watch directory, process events)
-- [ ] T074 [P] [US2] Create tests/integration/test_stream_pipeline.py to verify Spark Structured Streaming logic
+- [x] T072 [P] [US2] Create tests/fixtures/malformed_events.json with valid and invalid JSON events
+- [x] T073 [P] [US2] Create tests/e2e/test_streaming_flow.py with file stream test (watch directory, process events)
+- [x] T074 [P] [US2] Create tests/integration/test_stream_pipeline.py to verify Spark Structured Streaming logic
 
 ### Implementation for User Story 2
 
-- [ ] T075 [P] [US2] Create src/streaming/sources/file_stream_source.py to read JSON files from directory using Spark readStream
-- [ ] T076 [P] [US2] Create src/streaming/sources/kafka_source.py to consume from Kafka using Spark Structured Streaming
-- [ ] T077 [US2] Create src/streaming/pipeline.py to orchestrate streaming: read → validate → route → write
-- [ ] T078 [US2] Integrate ValidationEngine from Phase 2 into streaming pipeline (apply rules to streaming DataFrame)
-- [ ] T079 [US2] Add schema evolution detection in streaming pipeline (detect new fields mid-stream)
-- [ ] T080 [US2] Create src/core/schema/evolution.py with schema merging and backward compatibility checks
-- [ ] T081 [US2] Create tests/unit/test_schema_evolution.py to verify schema merging logic
-- [ ] T082 [US2] Create tests/fixtures/schema_evolution_data.csv with schema changes (new columns, type changes)
-- [ ] T083 [US2] Create src/streaming/sinks/warehouse_sink.py to write valid stream records to warehouse using foreachBatch
-- [ ] T084 [US2] Create src/streaming/sinks/quarantine_sink.py to write invalid stream records to quarantine
-- [ ] T085 [US2] Add checkpoint management for exactly-once semantics (checkpointLocation in streaming config)
-- [ ] T086 [US2] Add streaming metrics (latency, throughput, backpressure) to src/observability/metrics.py
-- [ ] T087 [US2] Create src/cli/stream_cli.py with "start" command to start streaming pipeline
-- [ ] T088 [US2] Add "stop" command to stream CLI to gracefully stop streaming query
-- [ ] T089 [US2] Add "status" command to stream CLI to show streaming query status
-- [ ] T090 [US2] Integrate lineage tracking into streaming pipeline (reuse src/observability/lineage.py)
-- [ ] T091 [US2] Create config/stream_config.yaml with Spark streaming configuration (trigger interval, checkpoint location)
-- [ ] T092 [US2] Run tests/e2e/test_streaming_flow.py and verify events processed within 2 seconds
+- [x] T075 [P] [US2] Create src/streaming/sources/file_stream_source.py to read JSON files from directory using Spark readStream
+- [x] T076 [P] [US2] Create src/streaming/sources/kafka_source.py to consume from Kafka using Spark Structured Streaming
+- [x] T077 [US2] Create src/streaming/pipeline.py to orchestrate streaming: read → validate → route → write
+- [x] T078 [US2] Integrate ValidationEngine from Phase 2 into streaming pipeline (apply rules to streaming DataFrame)
+- [x] T079 [US2] Add schema evolution detection in streaming pipeline (detect new fields mid-stream)
+- [x] T080 [US2] Create src/core/schema/evolution.py with schema merging and backward compatibility checks
+- [x] T081 [US2] Create tests/unit/test_schema_evolution.py to verify schema merging logic
+- [x] T082 [US2] Create tests/fixtures/schema_evolution_data.csv with schema changes (new columns, type changes)
+- [x] T083 [US2] Create src/streaming/sinks/warehouse_sink.py to write valid stream records to warehouse using foreachBatch
+- [x] T084 [US2] Create src/streaming/sinks/quarantine_sink.py to write invalid stream records to quarantine
+- [x] T085 [US2] Add checkpoint management for exactly-once semantics (checkpointLocation in streaming config)
+- [x] T086 [US2] Add streaming metrics (latency, throughput, backpressure) to src/observability/metrics.py
+- [x] T087 [US2] Create src/cli/stream_cli.py with "start" command to start streaming pipeline
+- [x] T088 [US2] Add "stop" command to stream CLI to gracefully stop streaming query
+- [x] T089 [US2] Add "status" command to stream CLI to show streaming query status
+- [x] T090 [US2] Integrate lineage tracking into streaming pipeline (reuse src/observability/lineage.py)
+- [x] T091 [US2] Create config/stream_config.yaml with Spark streaming configuration (trigger interval, checkpoint location)
+- [x] T092 [US2] Run tests/e2e/test_streaming_flow.py and verify events processed within 2 seconds
 
 **Checkpoint**: At this point, User Stories 1, 2, AND 4 should all work independently (batch + streaming + audit operational)
 

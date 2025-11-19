@@ -1,0 +1,65 @@
+[
+  {
+    "transaction_id": "TXN0000000100",
+    "amount": 150.75,
+    "timestamp": "2025-11-19T10:00:00Z",
+    "customer_email": "valid@example.com",
+    "metadata": {
+      "source": "mobile_app",
+      "version": "2.0"
+    }
+  },
+  {
+    "transaction_id": "TXN0000000101",
+    "amount": -50.00,
+    "timestamp": "2025-11-19T10:01:00Z",
+    "customer_email": "negative_amount@example.com"
+  },
+  {
+    "transaction_id": "",
+    "amount": 200.00,
+    "timestamp": "2025-11-19T10:02:00Z",
+    "customer_email": "missing_id@example.com"
+  },
+  {
+    "transaction_id": "TXN0000000103",
+    "amount": 99999999.99,
+    "timestamp": "2025-11-19T10:03:00Z",
+    "customer_email": "over_limit@example.com"
+  },
+  {
+    "transaction_id": "TXN0000000104",
+    "amount": 75.50,
+    "timestamp": "invalid_timestamp",
+    "customer_email": "bad_timestamp@example.com"
+  },
+  {
+    "transaction_id": "TXN0000000105",
+    "amount": "not_a_number",
+    "timestamp": "2025-11-19T10:05:00Z",
+    "customer_email": "type_error@example.com"
+  },
+  {
+    "transaction_id": "TXN0000000106",
+    "amount": 125.00,
+    "timestamp": "2025-11-19T10:06:00Z",
+    "customer_email": "invalid_email_format"
+  },
+  {
+    "malformed": "This is not the expected schema",
+    "random_field": 12345
+  },
+  "This is a malformed JSON string that should fail parsing",
+  {
+    "transaction_id": "TXN0000000108",
+    "amount": null,
+    "timestamp": "2025-11-19T10:08:00Z",
+    "customer_email": "null_amount@example.com"
+  },
+  {
+    "transaction_id": "TXN0000000109",
+    "amount": 88.88,
+    "timestamp": "2025-11-19T10:09:00Z",
+    "customer_email": "valid_event@example.com"
+  }
+]

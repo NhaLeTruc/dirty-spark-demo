@@ -1,0 +1,3 @@
+transaction_id,amount,timestamp,customer_email
+TXN0000000400,100.00,2025-11-19T18:00:00Z,baseline@example.com
+TXN0000000401,200.00,2025-11-19T18:01:00Z,baseline@example.com
