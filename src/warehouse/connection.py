@@ -235,6 +235,26 @@ def close_pool() -> None:
         _global_pool = None
 
 
+def get_connection():
+    """
+    Get a database connection from the global pool.
+
+    This is a convenience function that returns a connection context manager.
+
+    Usage:
+        with get_connection() as conn:
+            # Use connection
+            pass
+
+    Returns:
+        Context manager that yields a database connection
+
+    Raises:
+        RuntimeError: If global pool is not initialized
+    """
+    return get_connection_context()
+
+
 @contextmanager
 def get_connection_context():
     """

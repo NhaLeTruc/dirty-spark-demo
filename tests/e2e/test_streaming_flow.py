@@ -17,7 +17,6 @@ from pyspark.sql import SparkSession
 
 from src.core.models.data_source import DataSource
 from src.streaming.pipeline import StreamingPipeline
-from src.warehouse.connection import get_connection
 
 
 @pytest.fixture(scope="module")
@@ -55,26 +54,21 @@ def checkpoint_dir():
 
 
 @pytest.fixture
-def test_database():
+def test_database(db_connection):
     """Setup test database and cleanup after test."""
-    # This will use the testcontainers fixture from conftest.py
-    # For now, we'll assume the database is already set up
-    conn = get_connection()
-    cursor = conn.cursor()
-
     # Clean test data before test
-    cursor.execute("DELETE FROM warehouse_data WHERE source_id = 'test_stream_source'")
-    cursor.execute("DELETE FROM quarantine_record WHERE source_id = 'test_stream_source'")
-    conn.commit()
+    with db_connection.cursor() as cursor:
+        cursor.execute("DELETE FROM warehouse_data WHERE source_id = 'test_stream_source'")
+        cursor.execute("DELETE FROM quarantine_record WHERE source_id = 'test_stream_source'")
+        db_connection.commit()
 
-    yield conn
+    yield db_connection
 
     # Cleanup after test
-    cursor.execute("DELETE FROM warehouse_data WHERE source_id = 'test_stream_source'")
-    cursor.execute("DELETE FROM quarantine_record WHERE source_id = 'test_stream_source'")
-    conn.commit()
-    cursor.close()
-    conn.close()
+    with db_connection.cursor() as cursor:
+        cursor.execute("DELETE FROM warehouse_data WHERE source_id = 'test_stream_source'")
+        cursor.execute("DELETE FROM quarantine_record WHERE source_id = 'test_stream_source'")
+        db_connection.commit()
 
 
 @pytest.mark.e2e

@@ -116,10 +116,29 @@ def postgres_container() -> Generator[PostgresContainer, None, None]:
                 init_sql = f.read()
 
             # Execute init script
-            conn_url = postgres.get_connection_url()
-            with psycopg.connect(conn_url) as conn:
+            # Build psycopg3-compatible connection string
+            conn_str = (
+                f"host={postgres.get_container_host_ip()} "
+                f"port={postgres.get_exposed_port(5432)} "
+                f"dbname=test_datawarehouse "
+                f"user=test_pipeline "
+                f"password=test_password"
+            )
+            with psycopg.connect(conn_str) as conn:
                 with conn.cursor() as cur:
-                    cur.execute(init_sql)
+                    # Replace 'pipeline' role with 'test_pipeline' in the init script
+                    # since testcontainers creates the user as 'test_pipeline'
+                    test_init_sql = init_sql.replace(
+                        "GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO pipeline;",
+                        "GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO test_pipeline;"
+                    ).replace(
+                        "GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO pipeline;",
+                        "GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO test_pipeline;"
+                    ).replace(
+                        "GRANT ALL PRIVILEGES ON ALL FUNCTIONS IN SCHEMA public TO pipeline;",
+                        "GRANT ALL PRIVILEGES ON ALL FUNCTIONS IN SCHEMA public TO test_pipeline;"
+                    )
+                    cur.execute(test_init_sql)
                 conn.commit()
 
         yield postgres
@@ -136,8 +155,15 @@ def db_connection(postgres_container) -> Generator[psycopg.Connection, None, Non
     Yields:
         psycopg Connection object
     """
-    conn_url = postgres_container.get_connection_url()
-    with psycopg.connect(conn_url) as conn:
+    # Build psycopg3-compatible connection string
+    conn_str = (
+        f"host={postgres_container.get_container_host_ip()} "
+        f"port={postgres_container.get_exposed_port(5432)} "
+        f"dbname=test_datawarehouse "
+        f"user=test_pipeline "
+        f"password=test_password"
+    )
+    with psycopg.connect(conn_str) as conn:
         yield conn
         # Rollback any uncommitted changes after test
         conn.rollback()

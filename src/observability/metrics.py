@@ -444,3 +444,63 @@ def record_validation_failure(source_id: str, rule_type: str, field_name: str) -
         field_name: Name of field that failed validation
     """
     increment_counter(validation_failures_total, 1, source_id=source_id, rule_type=rule_type, field_name=field_name)
+
+
+# =======================
+# METRICS COLLECTOR CLASS
+# =======================
+
+class MetricsCollector:
+    """
+    Metrics collector for streaming pipeline components.
+
+    This class provides a unified interface for collecting metrics
+    from various pipeline components.
+    """
+
+    def __init__(self):
+        """Initialize metrics collector."""
+        pass
+
+    def record_batch_processed(
+        self,
+        source_id: str,
+        record_count: int,
+        success: bool = True,
+        duration_seconds: float = 0.0
+    ) -> None:
+        """
+        Record a batch processing event.
+
+        Args:
+            source_id: Data source ID
+            record_count: Number of records in the batch
+            success: Whether the batch was processed successfully
+            duration_seconds: Time taken to process the batch
+        """
+        status = "success" if success else "failure"
+        increment_counter(batches_processed_total, 1, source_id=source_id, status=status)
+        if record_count > 0:
+            observe_histogram(batch_size, record_count, source_id=source_id)
+        if duration_seconds > 0:
+            observe_histogram(processing_duration_seconds, duration_seconds, source_id=source_id, mode="stream")
+
+    def record_quarantine_batch(
+        self,
+        source_id: str,
+        record_count: int,
+        duration_seconds: float = 0.0
+    ) -> None:
+        """
+        Record a quarantine batch write event.
+
+        Args:
+            source_id: Data source ID
+            record_count: Number of records quarantined
+            duration_seconds: Time taken to write the batch
+        """
+        if record_count > 0:
+            increment_counter(records_processed_total, record_count, source_id=source_id, status="invalid")
+            set_gauge(quarantine_size, record_count, source_id=source_id)
+        if duration_seconds > 0:
+            observe_histogram(processing_duration_seconds, duration_seconds, source_id=source_id, mode="quarantine")
