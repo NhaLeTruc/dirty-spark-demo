@@ -4,8 +4,8 @@ Schema management operations for the data warehouse.
 Handles schema versioning, evolution, and DDL operations.
 """
 
-from typing import Dict, Any, List
-from datetime import datetime
+from typing import Any
+
 from .connection import DatabaseConnectionPool
 
 
@@ -32,7 +32,7 @@ class SchemaManager:
     def create_schema_version(
         self,
         source_id: str,
-        schema_definition: Dict[str, Any],
+        schema_definition: dict[str, Any],
         inferred: bool = True,
         confidence: float | None = None
     ) -> int:
@@ -74,7 +74,7 @@ class SchemaManager:
 
         return result[0]["schema_id"]
 
-    def get_active_schema(self, source_id: str) -> Dict[str, Any] | None:
+    def get_active_schema(self, source_id: str) -> dict[str, Any] | None:
         """
         Get the active (non-deprecated) schema for a source.
 
@@ -96,7 +96,7 @@ class SchemaManager:
         result = self.pool.execute_query(query, (source_id,))
         return result[0] if result else None
 
-    def get_schema_by_version(self, source_id: str, version: int) -> Dict[str, Any] | None:
+    def get_schema_by_version(self, source_id: str, version: int) -> dict[str, Any] | None:
         """
         Get a specific schema version.
 
@@ -133,7 +133,7 @@ class SchemaManager:
 
         self.pool.execute_command(query, (source_id, version))
 
-    def list_schema_history(self, source_id: str, limit: int = 10) -> List[Dict[str, Any]]:
+    def list_schema_history(self, source_id: str, limit: int = 10) -> list[dict[str, Any]]:
         """
         List schema version history for a source.
 
@@ -176,9 +176,9 @@ class SchemaManager:
 
     def compare_schemas(
         self,
-        schema1: Dict[str, Any],
-        schema2: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        schema1: dict[str, Any],
+        schema2: dict[str, Any]
+    ) -> dict[str, Any]:
         """
         Compare two schemas and identify differences.
 

@@ -6,11 +6,11 @@ and custom validation logic.
 """
 
 from .base_validator import BaseValidator, ValidationError
-from .required_field_validator import RequiredFieldValidator
-from .type_validator import TypeValidator
+from .custom_validator import CustomValidator
 from .range_validator import RangeValidator
 from .regex_validator import RegexValidator
-from .custom_validator import CustomValidator
+from .required_field_validator import RequiredFieldValidator
+from .type_validator import TypeValidator
 
 __all__ = [
     "BaseValidator",

@@ -2,12 +2,13 @@
 Unit tests for rule engine and rule configuration.
 """
 
-import pytest
 import tempfile
 from pathlib import Path
 
+import pytest
+
 from src.core.models import DataRecord
-from src.core.rules import RuleEngine, RuleConfigLoader, RuleConfigBuilder
+from src.core.rules import RuleConfigBuilder, RuleConfigLoader, RuleEngine
 
 
 class TestRuleEngine:

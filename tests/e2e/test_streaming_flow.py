@@ -10,13 +10,11 @@ import shutil
 import tempfile
 import time
 from pathlib import Path
-from typing import Dict, List
 
 import pytest
 from pyspark.sql import SparkSession
 
 from src.core.models.data_source import DataSource
-from src.streaming.pipeline import StreamingPipeline
 
 
 @pytest.fixture(scope="module")
@@ -110,7 +108,7 @@ class TestStreamingFlow:
                 f.write(json.dumps(event) + "\n")
 
         # Configure data source
-        data_source = DataSource(
+        DataSource(
             source_id="test_stream_source",
             source_type="json_stream",
             connection_info={
@@ -140,7 +138,7 @@ class TestStreamingFlow:
             "SELECT COUNT(*) FROM warehouse_data WHERE source_id = %s",
             ("test_stream_source",)
         )
-        warehouse_count = cursor.fetchone()[0]
+        cursor.fetchone()[0]
 
         # This assertion will FAIL until streaming pipeline is implemented
         # assert warehouse_count == 2, f"Expected 2 valid records in warehouse, got {warehouse_count}"
@@ -225,7 +223,6 @@ class TestStreamingFlow:
         max_wait = 5.0
         poll_interval = 0.1
         elapsed = 0.0
-        found = False
 
         while elapsed < max_wait:
             cursor.execute(
@@ -237,7 +234,6 @@ class TestStreamingFlow:
             )
             count = cursor.fetchone()[0]
             if count > 0:
-                found = True
                 break
             time.sleep(poll_interval)
             elapsed = time.time() - start_time
@@ -281,22 +277,8 @@ class TestStreamingFlow:
         - Verify schema evolution is detected and handled
         """
         # Initial events with baseline schema
-        baseline_event = {
-            "transaction_id": "TXN0000000240",
-            "amount": 100.00,
-            "timestamp": "2025-11-19T16:00:00Z",
-            "customer_email": "baseline@example.com",
-        }
 
         # Event with new field
-        evolved_event = {
-            "transaction_id": "TXN0000000241",
-            "amount": 150.00,
-            "timestamp": "2025-11-19T16:01:00Z",
-            "customer_email": "evolved@example.com",
-            "payment_method": "credit_card",  # New field
-            "merchant_category": "retail",  # Another new field
-        }
 
         # This test will FAIL until schema evolution is implemented
         pytest.skip("Schema evolution not yet implemented (T079-T082)")

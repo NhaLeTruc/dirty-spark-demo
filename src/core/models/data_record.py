@@ -2,9 +2,10 @@
 DataRecord model representing a single unit of data being processed (ephemeral).
 """
 
-from pydantic import BaseModel, Field
-from typing import Dict, Any, Literal
 from datetime import datetime
+from typing import Any, Literal
+
+from pydantic import BaseModel, Field
 
 
 class DataRecord(BaseModel):
@@ -26,8 +27,8 @@ class DataRecord(BaseModel):
 
     record_id: str = Field(..., min_length=1)
     source_id: str
-    raw_payload: Dict[str, Any]
-    processed_payload: Dict[str, Any] | None = None
+    raw_payload: dict[str, Any]
+    processed_payload: dict[str, Any] | None = None
     validation_status: Literal["pending", "valid", "invalid", "manual_review"] = "pending"
     processing_timestamp: datetime = Field(default_factory=datetime.utcnow)
     batch_id: str | None = None

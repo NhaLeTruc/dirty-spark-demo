@@ -4,8 +4,8 @@ Unit tests for lineage tracking logic.
 Tests AuditLog creation and lineage tracker functionality.
 """
 
+
 import pytest
-from datetime import datetime
 
 
 def test_create_audit_log_for_type_coercion():

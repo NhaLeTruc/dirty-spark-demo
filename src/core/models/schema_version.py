@@ -2,9 +2,10 @@
 SchemaVersion model representing a snapshot of a data schema at a point in time.
 """
 
-from pydantic import BaseModel, Field
-from typing import Dict, Any
 from datetime import datetime
+from typing import Any
+
+from pydantic import BaseModel, Field
 
 
 class SchemaVersion(BaseModel):
@@ -25,7 +26,7 @@ class SchemaVersion(BaseModel):
     schema_id: int | None = None
     source_id: str
     version: int = Field(..., gt=0)
-    schema_definition: Dict[str, Any]  # Spark schema as dict
+    schema_definition: dict[str, Any]  # Spark schema as dict
     inferred: bool = True
     confidence: float | None = Field(None, ge=0.0, le=1.0)
     created_at: datetime = Field(default_factory=datetime.utcnow)

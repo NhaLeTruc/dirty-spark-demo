@@ -2,10 +2,11 @@
 Unit tests for schema inference.
 """
 
-import pytest
 from pathlib import Path
+
+import pytest
 from pyspark.sql import SparkSession
-from pyspark.sql.types import StructType, StructField, StringType, DoubleType, IntegerType
+from pyspark.sql.types import DoubleType, StringType, StructField, StructType
 
 from src.core.schema.inference import SchemaInferrer
 

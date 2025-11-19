@@ -2,9 +2,10 @@
 WarehouseData model representing clean, validated data stored in the warehouse.
 """
 
-from pydantic import BaseModel, Field
-from typing import Dict, Any
 from datetime import datetime
+from typing import Any
+
+from pydantic import BaseModel, Field
 
 
 class WarehouseData(BaseModel):
@@ -22,7 +23,7 @@ class WarehouseData(BaseModel):
 
     record_id: str = Field(..., min_length=1)
     source_id: str
-    data: Dict[str, Any]
+    data: dict[str, Any]
     schema_version_id: int | None = None
     processed_at: datetime = Field(default_factory=datetime.utcnow)
     checksum: str | None = None

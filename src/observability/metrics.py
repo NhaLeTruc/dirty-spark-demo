@@ -5,16 +5,15 @@ This module provides metrics instrumentation for monitoring
 pipeline performance, data quality, and system health.
 """
 import os
-from prometheus_client import (
-    Counter,
-    Histogram,
-    Gauge,
-    CollectorRegistry,
-    generate_latest,
-    CONTENT_TYPE_LATEST,
-)
-from typing import Optional
 
+from prometheus_client import (
+    CONTENT_TYPE_LATEST,
+    CollectorRegistry,
+    Counter,
+    Gauge,
+    Histogram,
+    generate_latest,
+)
 
 # Global registry for metrics
 REGISTRY = CollectorRegistry()
@@ -299,7 +298,7 @@ def get_content_type() -> str:
     return CONTENT_TYPE_LATEST
 
 
-def start_metrics_server(port: Optional[int] = None) -> None:
+def start_metrics_server(port: int | None = None) -> None:
     """
     Start HTTP server for Prometheus metrics
 

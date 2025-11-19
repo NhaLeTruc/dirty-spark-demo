@@ -2,7 +2,8 @@
 TypeValidator - validates and optionally coerces field types.
 """
 
-from typing import Any, Dict, Type
+from typing import Any
+
 from .base_validator import BaseValidator, ValidationError
 
 
@@ -29,7 +30,7 @@ class TypeValidator(BaseValidator):
         "bool": bool,
     }
 
-    def __init__(self, field_name: str, parameters: Dict[str, Any] | None = None):
+    def __init__(self, field_name: str, parameters: dict[str, Any] | None = None):
         super().__init__(field_name, parameters)
 
         # Get expected type from parameters
@@ -48,7 +49,7 @@ class TypeValidator(BaseValidator):
         # Whether to attempt type coercion
         self.coerce = self.parameters.get("coerce", True)
 
-    def validate(self, value: Any, record: Dict[str, Any]) -> None:
+    def validate(self, value: Any, record: dict[str, Any]) -> None:
         """
         Validate that the value matches the expected type.
 

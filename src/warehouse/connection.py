@@ -5,9 +5,10 @@ This module provides a connection pool for efficient database access
 with automatic connection lifecycle management.
 """
 import os
-from typing import Optional
+import time
 from contextlib import contextmanager
-import psycopg
+
+from psycopg import OperationalError
 from psycopg.rows import dict_row
 from psycopg_pool import ConnectionPool
 
@@ -22,11 +23,11 @@ class DatabaseConnectionPool:
 
     def __init__(
         self,
-        host: Optional[str] = None,
-        port: Optional[int] = None,
-        database: Optional[str] = None,
-        user: Optional[str] = None,
-        password: Optional[str] = None,
+        host: str | None = None,
+        port: int | None = None,
+        database: str | None = None,
+        user: str | None = None,
+        password: str | None = None,
         min_size: int = 2,
         max_size: int = 10,
         timeout: float = 30.0,
@@ -72,10 +73,19 @@ class DatabaseConnectionPool:
         )
 
         # Initialize connection pool
-        self._pool: Optional[ConnectionPool] = None
+        self._pool: ConnectionPool | None = None
 
-    def open(self) -> None:
-        """Open the connection pool"""
+    def open(self, max_retries: int = 3, retry_delay: float = 2.0) -> None:
+        """
+        Open the connection pool with retry logic.
+
+        Args:
+            max_retries: Maximum number of connection attempts
+            retry_delay: Delay between retries in seconds
+
+        Raises:
+            OperationalError: If connection fails after all retries
+        """
         if self._pool is None:
             self._pool = ConnectionPool(
                 conninfo=self.conninfo,
@@ -84,8 +94,23 @@ class DatabaseConnectionPool:
                 timeout=self.timeout,
                 kwargs={"row_factory": dict_row},  # Return rows as dictionaries
             )
-            # Open the pool (wait for min_size connections)
-            self._pool.open()
+
+            # Attempt to open pool with retry logic
+            last_error = None
+            for attempt in range(1, max_retries + 1):
+                try:
+                    self._pool.open()
+                    return  # Success
+                except OperationalError as e:
+                    last_error = e
+                    if attempt < max_retries:
+                        time.sleep(retry_delay)
+                    else:
+                        # Final attempt failed
+                        self._pool = None
+                        raise OperationalError(
+                            f"Failed to connect to database after {max_retries} attempts: {e}"
+                        ) from e
 
     def close(self) -> None:
         """Close the connection pool"""
@@ -125,7 +150,7 @@ class DatabaseConnectionPool:
             with conn.cursor() as cur:
                 yield cur
 
-    def execute_query(self, query: str, params: Optional[tuple] = None) -> list[dict]:
+    def execute_query(self, query: str, params: tuple | None = None) -> list[dict]:
         """
         Execute a SELECT query and return results
 
@@ -141,7 +166,7 @@ class DatabaseConnectionPool:
             return cur.fetchall()
 
     def execute_command(
-        self, command: str, params: Optional[tuple] = None
+        self, command: str, params: tuple | None = None
     ) -> int:
         """
         Execute an INSERT/UPDATE/DELETE command
@@ -187,7 +212,7 @@ class DatabaseConnectionPool:
 
 
 # Singleton instance for application-wide use
-_global_pool: Optional[DatabaseConnectionPool] = None
+_global_pool: DatabaseConnectionPool | None = None
 
 
 def get_pool() -> DatabaseConnectionPool:

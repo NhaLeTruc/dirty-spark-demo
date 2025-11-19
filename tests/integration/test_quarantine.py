@@ -5,8 +5,9 @@ Tests quarantine filtering, statistics, and review functionality.
 """
 
 import json
-import pytest
 from datetime import datetime, timedelta
+
+import pytest
 
 
 @pytest.mark.integration

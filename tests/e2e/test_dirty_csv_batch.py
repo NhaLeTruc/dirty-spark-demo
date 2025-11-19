@@ -4,8 +4,9 @@ End-to-end test for batch CSV processing.
 Tests the complete flow: CSV file → validation → warehouse + quarantine
 """
 
-import pytest
 from pathlib import Path
+
+import pytest
 
 
 @pytest.mark.e2e

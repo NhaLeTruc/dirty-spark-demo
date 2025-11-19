@@ -2,8 +2,8 @@
 ValidationResult model representing the outcome of validating a record (ephemeral).
 """
 
+
 from pydantic import BaseModel, Field, field_validator
-from typing import List
 
 
 class ValidationResult(BaseModel):
@@ -25,10 +25,10 @@ class ValidationResult(BaseModel):
 
     record_id: str
     passed: bool
-    passed_rules: List[str] = Field(default_factory=list)
-    failed_rules: List[str] = Field(default_factory=list)
-    warnings: List[str] = Field(default_factory=list)
-    transformations_applied: List[str] = Field(default_factory=list)
+    passed_rules: list[str] = Field(default_factory=list)
+    failed_rules: list[str] = Field(default_factory=list)
+    warnings: list[str] = Field(default_factory=list)
+    transformations_applied: list[str] = Field(default_factory=list)
     confidence_score: float | None = Field(None, ge=0.0, le=1.0)
 
     @field_validator('failed_rules')

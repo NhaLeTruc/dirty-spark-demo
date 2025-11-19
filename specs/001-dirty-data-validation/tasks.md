@@ -213,21 +213,21 @@
 
 **Purpose**: Improvements that affect multiple user stories
 
-- [ ] T106 [P] Create config/validation-rules-example.yaml with comprehensive rule examples for documentation
+- [x] T106 [P] Create config/validation-rules-example.yaml with comprehensive rule examples for documentation
 - [ ] T107 [P] Add docstrings to all public functions and classes (Google style)
-- [ ] T108 [P] Run black formatter on entire codebase
-- [ ] T109 [P] Run ruff linter and fix all warnings
-- [ ] T110 [P] Run mypy type checker and fix all type errors
-- [ ] T111 [P] Add error handling and retry logic for database connection failures
-- [ ] T112 [P] Add graceful shutdown for streaming pipelines (handle SIGTERM/SIGINT)
-- [ ] T113 Create .github/workflows/ci.yml with pytest, linting, type checking on every push
-- [ ] T114 Run pytest with coverage report (pytest --cov=src --cov-report=html)
-- [ ] T115 Verify coverage >80% for all modules
+- [x] T108 [P] Run black formatter on entire codebase
+- [x] T109 [P] Run ruff linter and fix all warnings
+- [ ] T110 [P] Run mypy type checker and fix all type errors (90+ errors remain due to strict settings)
+- [x] T111 [P] Add error handling and retry logic for database connection failures
+- [x] T112 [P] Add graceful shutdown for streaming pipelines (handle SIGTERM/SIGINT)
+- [x] T113 Create .github/workflows/ci.yml with pytest, linting, type checking on every push
+- [x] T114 Run pytest with coverage report (pytest --cov=src --cov-report=html)
+- [ ] T115 Verify coverage >80% for all modules (current: 38.65% - many streaming features intentionally skipped)
 - [ ] T116 [P] Add performance benchmarks for batch processing (measure throughput with 100K records)
 - [ ] T117 [P] Add performance benchmarks for streaming (measure latency with event bursts)
 - [ ] T118 Create tests/fixtures/large_dataset.csv with 100K+ records for performance testing
 - [ ] T119 Validate quickstart.md instructions work end-to-end on clean environment
-- [ ] T120 Create CONTRIBUTING.md with development guidelines
+- [x] T120 Create CONTRIBUTING.md with development guidelines
 
 ---
 

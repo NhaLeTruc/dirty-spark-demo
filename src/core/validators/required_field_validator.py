@@ -2,7 +2,8 @@
 RequiredFieldValidator - ensures a field is present and not null/empty.
 """
 
-from typing import Any, Dict
+from typing import Any
+
 from .base_validator import BaseValidator, ValidationError
 
 
@@ -16,11 +17,11 @@ class RequiredFieldValidator(BaseValidator):
     - Field value is an empty string (configurable)
     """
 
-    def __init__(self, field_name: str, parameters: Dict[str, Any] | None = None):
+    def __init__(self, field_name: str, parameters: dict[str, Any] | None = None):
         super().__init__(field_name, parameters)
         self.allow_empty_string = self.parameters.get("allow_empty_string", False)
 
-    def validate(self, value: Any, record: Dict[str, Any]) -> None:
+    def validate(self, value: Any, record: dict[str, Any]) -> None:
         """
         Validate that the field is present and not null/empty.
 

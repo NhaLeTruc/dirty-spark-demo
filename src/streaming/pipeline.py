@@ -4,9 +4,8 @@ Streaming pipeline orchestration for real-time data validation.
 Coordinates the flow: source → validation → routing → sinks (warehouse/quarantine)
 """
 
-import logging
-from typing import Optional, Dict, Any
 from pathlib import Path
+from typing import Any
 
 from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql.streaming import StreamingQuery
@@ -14,10 +13,10 @@ from pyspark.sql.types import StructType
 
 from src.core.models.data_source import DataSource
 from src.core.rules.rule_engine import RuleEngine
-from src.streaming.sources.file_stream_source import FileStreamSource
-from src.streaming.sources.kafka_source import KafkaSource
 from src.observability.logger import get_logger
 from src.observability.metrics import MetricsCollector
+from src.streaming.sources.file_stream_source import FileStreamSource
+from src.streaming.sources.kafka_source import KafkaSource
 
 logger = get_logger(__name__)
 
@@ -40,7 +39,7 @@ class StreamingPipeline:
         data_source: DataSource,
         validation_engine: RuleEngine,
         checkpoint_location: str,
-        schema: Optional[StructType] = None,
+        schema: StructType | None = None,
         trigger_interval: str = "10 seconds",
     ):
         """
@@ -65,7 +64,7 @@ class StreamingPipeline:
         self.metrics = MetricsCollector()
 
         # Streaming query handle (set when started)
-        self.query: Optional[StreamingQuery] = None
+        self.query: StreamingQuery | None = None
 
         # Ensure checkpoint directory exists
         checkpoint_path = Path(checkpoint_location)
@@ -145,7 +144,7 @@ class StreamingPipeline:
 
         return validated_df
 
-    def _route_records(self, validated_df: DataFrame) -> Dict[str, DataFrame]:
+    def _route_records(self, validated_df: DataFrame) -> dict[str, DataFrame]:
         """
         Route records to warehouse or quarantine based on validation status.
 
@@ -200,8 +199,8 @@ class StreamingPipeline:
             # 4. Write to sinks using foreachBatch for transactional writes
             # Lazy import: Only load sink modules when actually creating streams
             # Allows pipeline to be imported without all sink dependencies
-            from src.streaming.sinks.warehouse_sink import create_warehouse_sink_writer
             from src.streaming.sinks.quarantine_sink import create_quarantine_sink_writer
+            from src.streaming.sinks.warehouse_sink import create_warehouse_sink_writer
 
             # Create sink writers
             warehouse_writer = create_warehouse_sink_writer(self.metrics)
@@ -245,7 +244,7 @@ class StreamingPipeline:
             logger.error(f"Failed to start streaming pipeline: {e}", exc_info=True)
             raise
 
-    def stop(self, timeout_seconds: Optional[int] = None) -> None:
+    def stop(self, timeout_seconds: int | None = None) -> None:
         """
         Stop the streaming pipeline gracefully.
 
@@ -276,7 +275,7 @@ class StreamingPipeline:
             logger.error(f"Error stopping streaming pipeline: {e}", exc_info=True)
             raise
 
-    def get_status(self) -> Dict[str, Any]:
+    def get_status(self) -> dict[str, Any]:
         """
         Get current status of the streaming pipeline.
 
@@ -318,7 +317,7 @@ class StreamingPipeline:
                 "source_id": self.data_source.source_id,
             }
 
-    def await_termination(self, timeout_seconds: Optional[int] = None) -> None:
+    def await_termination(self, timeout_seconds: int | None = None) -> None:
         """
         Wait for streaming query to terminate.
 
@@ -347,7 +346,7 @@ def create_streaming_pipeline(
     data_source: DataSource,
     validation_rules_path: str,
     checkpoint_location: str,
-    schema: Optional[StructType] = None,
+    schema: StructType | None = None,
     trigger_interval: str = "10 seconds",
 ) -> StreamingPipeline:
     """

@@ -17,11 +17,12 @@ import argparse
 import json
 import sys
 from datetime import datetime
-from typing import Any, List
-import yaml
+from typing import Any
 
+import yaml
 from pyspark.sql import SparkSession
 
+from src.batch.reprocess import QuarantineReprocessor, get_quarantine_statistics
 from src.observability.logger import get_logger
 from src.warehouse.audit import (
     get_audit_summary,
@@ -30,7 +31,6 @@ from src.warehouse.audit import (
     query_audit_logs_by_transformation_type,
 )
 from src.warehouse.connection import DatabaseConnectionPool
-from src.batch.reprocess import QuarantineReprocessor, get_quarantine_statistics
 
 logger = get_logger(__name__)
 
@@ -487,7 +487,7 @@ def add_rule_command(args):
         pool.open()
 
         # Load rule from file
-        with open(args.rule_file, 'r') as f:
+        with open(args.rule_file) as f:
             if args.rule_file.endswith('.yaml') or args.rule_file.endswith('.yml'):
                 rule_data = yaml.safe_load(f)
             else:
@@ -551,7 +551,7 @@ def update_rule_command(args):
         params = []
 
         if args.rule_config:
-            with open(args.rule_config, 'r') as f:
+            with open(args.rule_config) as f:
                 config = json.load(f)
             updates.append("rule_config = %s")
             params.append(json.dumps(config))

@@ -1,0 +1,76 @@
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+.venv/
+venv/
+ENV/
+env/
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.hypothesis/
+*.cover
+tests/
+
+# IDEs
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Documentation
+README.md
+docs/
+specs/
+*.md
+!quickstart.md
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+
+# Docker
+Dockerfile*
+.dockerignore
+docker-compose*.yml
+
+# Logs
+*.log
+
+# Environment
+.env*
+*.secret
+local.env
+
+# Temporary
+*.tmp
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Spark
+checkpoints/
+spark-warehouse/
+metastore_db/
+derby.log
+
+# Data files
+*.csv
+*.parquet
+!tests/fixtures/*.csv

@@ -5,16 +5,17 @@ The rule engine loads validation rules, applies them to records,
 and produces validation results.
 """
 
-from typing import Dict, List, Any
+from typing import Any
+
 from src.core.models import DataRecord, ValidationResult
 from src.core.validators import (
     BaseValidator,
-    ValidationError,
-    RequiredFieldValidator,
-    TypeValidator,
+    CustomValidator,
     RangeValidator,
     RegexValidator,
-    CustomValidator,
+    RequiredFieldValidator,
+    TypeValidator,
+    ValidationError,
 )
 
 
@@ -34,7 +35,7 @@ class RuleEngine:
         "custom": CustomValidator,
     }
 
-    def __init__(self, rules: List[Dict[str, Any]]):
+    def __init__(self, rules: list[dict[str, Any]]):
         """
         Initialize the rule engine with validation rules.
 
@@ -48,7 +49,7 @@ class RuleEngine:
                    - enabled: bool (default True)
         """
         self.rules = rules
-        self.validators: List[tuple[str, str, BaseValidator]] = []
+        self.validators: list[tuple[str, str, BaseValidator]] = []
         self._build_validators()
 
     def _build_validators(self) -> None:
@@ -105,7 +106,7 @@ class RuleEngine:
                 validator.validate(value, payload)
                 passed_rules.append(rule_name)
 
-            except ValidationError as e:
+            except ValidationError:
                 # Handle validation failure
                 if severity == "error":
                     failed_rules.append(rule_name)
@@ -125,7 +126,7 @@ class RuleEngine:
             transformations_applied=transformations,
         )
 
-    def validate_batch(self, records: List[DataRecord]) -> List[ValidationResult]:
+    def validate_batch(self, records: list[DataRecord]) -> list[ValidationResult]:
         """
         Validate a batch of records.
 
@@ -137,7 +138,7 @@ class RuleEngine:
         """
         return [self.validate_record(record) for record in records]
 
-    def get_rule_summary(self) -> Dict[str, Any]:
+    def get_rule_summary(self) -> dict[str, Any]:
         """
         Get summary of loaded rules.
 
@@ -150,17 +151,17 @@ class RuleEngine:
             "rules_by_severity": self._count_by_severity(),
         }
 
-    def _count_by_type(self) -> Dict[str, int]:
+    def _count_by_type(self) -> dict[str, int]:
         """Count validators by rule type."""
-        counts: Dict[str, int] = {}
+        counts: dict[str, int] = {}
         for _, _, validator in self.validators:
             rule_type = validator.rule_type
             counts[rule_type] = counts.get(rule_type, 0) + 1
         return counts
 
-    def _count_by_severity(self) -> Dict[str, int]:
+    def _count_by_severity(self) -> dict[str, int]:
         """Count validators by severity."""
-        counts: Dict[str, int] = {}
+        counts: dict[str, int] = {}
         for _, severity, _ in self.validators:
             counts[severity] = counts.get(severity, 0) + 1
         return counts

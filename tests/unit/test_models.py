@@ -4,19 +4,20 @@ Unit tests for Pydantic data models.
 Tests all core models for validation, type coercion, and constraint enforcement.
 """
 
-import pytest
 from datetime import datetime
+
+import pytest
 from pydantic import ValidationError
 
 from src.core.models import (
-    DataSource,
-    ValidationRule,
-    DataRecord,
-    WarehouseData,
-    QuarantineRecord,
-    ValidationResult,
-    SchemaVersion,
     AuditLog,
+    DataRecord,
+    DataSource,
+    QuarantineRecord,
+    SchemaVersion,
+    ValidationResult,
+    ValidationRule,
+    WarehouseData,
 )
 
 

@@ -5,17 +5,14 @@ Enables reprocessing of quarantined records with updated validation rules.
 """
 
 import json
-from typing import List, Optional, Dict, Any
 from datetime import datetime
+from typing import Any
 
-from pyspark.sql import SparkSession, DataFrame
-from pyspark.sql.functions import col, from_json, to_json, struct
-from pyspark.sql.types import StructType, StructField, StringType
+from pyspark.sql import DataFrame, SparkSession
 
-from src.warehouse.connection import DatabaseConnectionPool
-from src.core.rules.rule_engine import RuleEngine
-from src.observability.logger import get_logger
 from src.observability import metrics
+from src.observability.logger import get_logger
+from src.warehouse.connection import DatabaseConnectionPool
 
 logger = get_logger(__name__)
 
@@ -43,10 +40,10 @@ class QuarantineReprocessor:
     def reprocess_quarantine(
         self,
         source_id: str,
-        record_ids: Optional[List[str]] = None,
-        error_types: Optional[List[str]] = None,
-        limit: Optional[int] = None
-    ) -> Dict[str, Any]:
+        record_ids: list[str] | None = None,
+        error_types: list[str] | None = None,
+        limit: int | None = None
+    ) -> dict[str, Any]:
         """
         Reprocess quarantined records.
 
@@ -90,7 +87,7 @@ class QuarantineReprocessor:
         self.logger.info(f"Found {total_records} quarantine records to reprocess")
 
         # Convert to DataFrame for processing
-        df = self._create_dataframe_from_quarantine(quarantine_records)
+        self._create_dataframe_from_quarantine(quarantine_records)
 
         # Apply validation rules
         # Note: In a full implementation, this would:
@@ -135,10 +132,10 @@ class QuarantineReprocessor:
     def _fetch_quarantine_records(
         self,
         source_id: str,
-        record_ids: Optional[List[str]] = None,
-        error_types: Optional[List[str]] = None,
-        limit: Optional[int] = None
-    ) -> List[Dict[str, Any]]:
+        record_ids: list[str] | None = None,
+        error_types: list[str] | None = None,
+        limit: int | None = None
+    ) -> list[dict[str, Any]]:
         """
         Fetch quarantine records from database.
 
@@ -177,7 +174,7 @@ class QuarantineReprocessor:
 
     def _create_dataframe_from_quarantine(
         self,
-        records: List[Dict[str, Any]]
+        records: list[dict[str, Any]]
     ) -> DataFrame:
         """
         Convert quarantine records to Spark DataFrame.
@@ -204,7 +201,7 @@ class QuarantineReprocessor:
         df = self.spark.createDataFrame(data)
         return df
 
-    def _mark_records_reprocessed(self, record_ids: List[str]) -> None:
+    def _mark_records_reprocessed(self, record_ids: list[str]) -> None:
         """
         Mark quarantine records as reprocessed.
 
@@ -230,8 +227,8 @@ class QuarantineReprocessor:
 
 def get_quarantine_statistics(
     pool: DatabaseConnectionPool,
-    source_id: Optional[str] = None
-) -> Dict[str, Any]:
+    source_id: str | None = None
+) -> dict[str, Any]:
     """
     Get quarantine statistics.
 

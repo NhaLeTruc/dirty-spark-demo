@@ -6,19 +6,35 @@ Provides commands to start, stop, and monitor streaming data validation pipeline
 
 import argparse
 import json
+import signal
 import sys
-import logging
-from pathlib import Path
-from typing import Optional
+import time
 
 from pyspark.sql import SparkSession
-from pyspark.sql.types import StructType, StructField, StringType, DoubleType
+from pyspark.sql.types import DoubleType, StringType, StructField, StructType
 
 from src.core.models.data_source import DataSource
-from src.streaming.pipeline import create_streaming_pipeline
 from src.observability.logger import get_logger
+from src.streaming.pipeline import create_streaming_pipeline
 
 logger = get_logger(__name__)
+
+# Global flag for graceful shutdown
+_shutdown_requested = False
+
+
+def signal_handler(signum, frame):  # type: ignore[no-untyped-def]
+    """
+    Handle shutdown signals (SIGINT, SIGTERM) for graceful pipeline termination.
+
+    Args:
+        signum: Signal number
+        frame: Current stack frame
+    """
+    global _shutdown_requested
+    signal_name = signal.Signals(signum).name
+    logger.info(f"Received {signal_name} signal, initiating graceful shutdown...")
+    _shutdown_requested = True
 
 
 def create_spark_session(app_name: str = "StreamingPipeline") -> SparkSession:
@@ -43,7 +59,7 @@ def create_spark_session(app_name: str = "StreamingPipeline") -> SparkSession:
 
 def start_stream(args: argparse.Namespace) -> int:
     """
-    Start a streaming pipeline.
+    Start a streaming pipeline with graceful shutdown support.
 
     Args:
         args: Parsed command-line arguments
@@ -51,6 +67,12 @@ def start_stream(args: argparse.Namespace) -> int:
     Returns:
         Exit code (0 for success)
     """
+    global _shutdown_requested
+
+    # Register signal handlers for graceful shutdown
+    signal.signal(signal.SIGINT, signal_handler)
+    signal.signal(signal.SIGTERM, signal_handler)
+
     try:
         logger.info(f"Starting streaming pipeline for source: {args.source}")
 
@@ -126,7 +148,19 @@ def start_stream(args: argparse.Namespace) -> int:
         # Wait for termination if requested
         if not args.detach:
             logger.info("Waiting for termination (press Ctrl+C to stop)...")
-            query.awaitTermination()
+
+            # Monitor for shutdown signal while query is running
+            while query.isActive and not _shutdown_requested:
+                time.sleep(1)
+
+            # Graceful shutdown
+            if _shutdown_requested and query.isActive:
+                logger.info("Stopping query gracefully...")
+                query.stop()
+                logger.info("Query stopped. Waiting for cleanup...")
+                # Give Spark time to complete final micro-batch and checkpoint
+                time.sleep(2)
+                logger.info("Shutdown complete")
 
         return 0
 
@@ -159,7 +193,7 @@ def stop_stream(args: argparse.Namespace) -> int:
                 logger.info(f"Found query: {query.name} ({query.id})")
                 query.stop()
                 found = True
-                logger.info(f"Query stopped successfully")
+                logger.info("Query stopped successfully")
                 break
 
         if not found:

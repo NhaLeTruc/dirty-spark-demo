@@ -2,7 +2,8 @@
 RangeValidator - validates numeric values are within a specified range.
 """
 
-from typing import Any, Dict
+from typing import Any
+
 from .base_validator import BaseValidator, ValidationError
 
 
@@ -17,7 +18,7 @@ class RangeValidator(BaseValidator):
     - max_exclusive: Maximum value (exclusive)
     """
 
-    def __init__(self, field_name: str, parameters: Dict[str, Any] | None = None):
+    def __init__(self, field_name: str, parameters: dict[str, Any] | None = None):
         super().__init__(field_name, parameters)
 
         # Extract range boundaries
@@ -30,7 +31,7 @@ class RangeValidator(BaseValidator):
         if all(v is None for v in [self.min_value, self.max_value, self.min_exclusive, self.max_exclusive]):
             raise ValueError("RangeValidator requires at least one of: min, max, min_exclusive, max_exclusive")
 
-    def validate(self, value: Any, record: Dict[str, Any]) -> None:
+    def validate(self, value: Any, record: dict[str, Any]) -> None:
         """
         Validate that the value is within the specified range.
 
@@ -46,7 +47,7 @@ class RangeValidator(BaseValidator):
             return
 
         # Ensure value is numeric
-        if not isinstance(value, (int, float)):
+        if not isinstance(value, int | float):
             raise ValidationError(
                 rule_name="range",
                 field_name=self.field_name,

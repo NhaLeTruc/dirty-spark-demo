@@ -4,8 +4,8 @@ Integration tests for audit trail and data lineage tracking.
 Tests end-to-end lineage: record processing → transformations → audit_log entries
 """
 
+
 import pytest
-from datetime import datetime
 
 
 @pytest.mark.integration

@@ -7,7 +7,6 @@ of files as they arrive.
 
 import logging
 from pathlib import Path
-from typing import Optional
 
 from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql.types import StructType
@@ -29,7 +28,7 @@ class FileStreamSource:
         self,
         spark: SparkSession,
         data_source: DataSource,
-        schema: Optional[StructType] = None,
+        schema: StructType | None = None,
     ):
         """
         Initialize file stream source.
@@ -157,7 +156,7 @@ def create_file_stream_source(
     stream_path: str,
     source_id: str,
     file_format: str = "json",
-    schema: Optional[StructType] = None,
+    schema: StructType | None = None,
 ) -> FileStreamSource:
     """
     Factory function to create FileStreamSource with minimal configuration.

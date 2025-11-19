@@ -7,11 +7,10 @@ Tests streaming-specific functionality without full E2E setup.
 import json
 import tempfile
 from pathlib import Path
-from typing import List
 
 import pytest
 from pyspark.sql import SparkSession
-from pyspark.sql.types import StructType, StructField, StringType, DoubleType, TimestampType
+from pyspark.sql.types import DoubleType, StringType, StructField, StructType
 
 
 @pytest.fixture(scope="module")

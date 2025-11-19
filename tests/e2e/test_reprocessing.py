@@ -5,15 +5,10 @@ Tests the complete flow: quarantine records → review → update rules → repr
 """
 
 import json
-import os
-import tempfile
-from pathlib import Path
 
 import pytest
-from pyspark.sql import SparkSession
 
 from src.batch.reprocess import QuarantineReprocessor
-from src.core.models.data_source import DataSource
 from src.warehouse.connection import DatabaseConnectionPool
 
 

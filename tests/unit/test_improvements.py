@@ -10,24 +10,24 @@ This module tests:
 """
 
 import pytest
+
+from src.core.models import ValidationResult
+from src.core.schema.inference import SchemaInferrer
+from src.observability.metrics import validation_warnings_total
 from src.utils.validation import (
-    validate_record_id,
-    validate_source_id,
-    validate_quarantine_ids,
-    validate_limit,
-    validate_offset,
+    ValidationError,
     sanitize_sql_identifier,
     validate_file_path,
-    ValidationError,
+    validate_limit,
+    validate_offset,
+    validate_quarantine_ids,
+    validate_record_id,
+    validate_source_id,
 )
-from src.core.models import ValidationResult
 from src.warehouse.connection import (
     get_connection_context,
     get_cursor_context,
 )
-from src.observability.metrics import validation_warnings_total
-from src.core.schema.inference import SchemaInferrer
-
 
 # =======================
 # VALIDATION UTILITIES TESTS
