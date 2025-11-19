@@ -143,9 +143,10 @@ class KafkaSource:
             )
 
         # Add source metadata
+        from pyspark.sql.functions import lit
         parsed_df = parsed_df.withColumn(
             "source_id",
-            self.spark.sql(f"SELECT '{self.data_source.source_id}'").first()[0]
+            lit(self.data_source.source_id)
         )
 
         # Keep Kafka metadata for lineage

@@ -13,7 +13,7 @@ from pyspark.sql.streaming import StreamingQuery
 from pyspark.sql.types import StructType
 
 from src.core.models.data_source import DataSource
-from src.core.rules.rule_engine import ValidationEngine
+from src.core.rules.rule_engine import RuleEngine
 from src.streaming.sources.file_stream_source import FileStreamSource
 from src.streaming.sources.kafka_source import KafkaSource
 from src.observability.logger import get_logger
@@ -38,7 +38,7 @@ class StreamingPipeline:
         self,
         spark: SparkSession,
         data_source: DataSource,
-        validation_engine: ValidationEngine,
+        validation_engine: RuleEngine,
         checkpoint_location: str,
         schema: Optional[StructType] = None,
         trigger_interval: str = "10 seconds",
@@ -49,7 +49,7 @@ class StreamingPipeline:
         Args:
             spark: Active Spark session
             data_source: DataSource configuration
-            validation_engine: ValidationEngine for data quality rules
+            validation_engine: RuleEngine for data quality rules
             checkpoint_location: Path for Spark checkpoints (for exactly-once)
             schema: Optional schema for source data
             trigger_interval: Micro-batch trigger interval (e.g., "10 seconds")
@@ -122,6 +122,8 @@ class StreamingPipeline:
         Returns:
             DataFrame with validation results
         """
+        # Lazy import: Avoid loading validation module until pipeline starts
+        # Reduces initial import overhead and allows pipeline to be imported without validation dependencies
         from src.streaming.validation import apply_validation_to_stream
 
         logger.info("Applying validation to streaming DataFrame")
@@ -196,6 +198,8 @@ class StreamingPipeline:
             invalid_df = routed["invalid"]
 
             # 4. Write to sinks using foreachBatch for transactional writes
+            # Lazy import: Only load sink modules when actually creating streams
+            # Allows pipeline to be imported without all sink dependencies
             from src.streaming.sinks.warehouse_sink import create_warehouse_sink_writer
             from src.streaming.sinks.quarantine_sink import create_quarantine_sink_writer
 
@@ -376,11 +380,13 @@ def create_streaming_pipeline(
         ... )
         >>> query = pipeline.start()
     """
+    # Lazy import: Configuration loading happens at runtime, not import time
+    # Allows using this module without having config files present
     from src.core.rules.rule_config import load_validation_rules
 
     # Load validation rules
     rules = load_validation_rules(validation_rules_path)
-    validation_engine = ValidationEngine(rules)
+    validation_engine = RuleEngine(rules)
 
     return StreamingPipeline(
         spark,

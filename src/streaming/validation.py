@@ -1,7 +1,7 @@
 """
 Validation integration for Spark Structured Streaming.
 
-Adapts the core ValidationEngine to work with streaming DataFrames.
+Adapts the core RuleEngine to work with streaming DataFrames.
 """
 
 import logging
@@ -24,7 +24,7 @@ def create_validation_udf(rule_engine: RuleEngine):
     Create a Spark UDF that applies validation rules to records.
 
     Args:
-        rule_engine: Configured ValidationEngine
+        rule_engine: Configured RuleEngine
 
     Returns:
         Spark UDF that validates records and returns validation status
@@ -95,7 +95,7 @@ def apply_validation_to_stream(
 
     Args:
         stream_df: Input streaming DataFrame
-        rule_engine: Configured ValidationEngine
+        rule_engine: Configured RuleEngine
 
     Returns:
         DataFrame with validation results added
@@ -155,7 +155,7 @@ def apply_validation_foreach_batch(
     and more control over batch processing.
 
     Args:
-        rule_engine: Configured ValidationEngine
+        rule_engine: Configured RuleEngine
 
     Returns:
         Function compatible with foreachBatch
@@ -231,7 +231,7 @@ class StreamValidationHandler:
         Initialize validation handler.
 
         Args:
-            rule_engine: Configured ValidationEngine
+            rule_engine: Configured RuleEngine
         """
         self.rule_engine = rule_engine
         self.validation_count = 0

@@ -4,10 +4,13 @@ Schema registry for managing schema versions.
 Saves and loads schemas from the schema_version table in PostgreSQL.
 """
 
-from typing import Dict, Any, Optional
+from typing import Any, Dict, Optional, Tuple
+
 from pyspark.sql.types import StructType
+
 from src.warehouse.connection import DatabaseConnectionPool
 from src.warehouse.schema_mgmt import SchemaManager
+
 from .inference import SchemaInferrer
 
 
@@ -51,8 +54,6 @@ class SchemaRegistry:
         Raises:
             ValueError: If neither sample_data_path nor sample_df provided when schema doesn't exist
         """
-        from typing import Tuple  # Local import to avoid circular dependency
-
         # Try to get existing active schema
         existing_schema = self.schema_manager.get_active_schema(source_id)
 
